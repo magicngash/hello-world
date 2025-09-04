@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kenya Payroll System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --info-color: #0dcaf0;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+            padding: 48px 0 0;
+            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+            background-color: #fff;
+            width: 280px;
+            transition: all 0.3s;
+        }
+
+        .sidebar-sticky {
+            position: sticky;
+            top: 48px;
+            height: calc(100vh - 48px);
+            padding-top: .5rem;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .sidebar .nav-link {
+            color: #333;
+            padding: 0.75rem 1rem;
+            border-radius: 0.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: #f8f9fa;
+        }
+
+        .sidebar .nav-link.active {
+            color: #fff;
+            background-color: var(--primary-color);
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 0.5rem;
+        }
+
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+        }
+
+        .stats-card {
+            border-radius: 0.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
+            border: 1px solid rgba(0,0,0,.125);
+            transition: transform 0.2s;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .stats-card .card-body {
+            padding: 1.25rem;
+        }
+
+        .stats-card .icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 1.5rem;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        .card {
+            border-radius: 0.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
+            border: 1px solid rgba(0,0,0,.125);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            background-color: #fff;
+            border-bottom: 1px solid rgba(0,0,0,.125);
+            font-weight: 600;
+        }
+
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .btn-action {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            margin-right: 0.25rem;
+        }
+
+        .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            border-radius: 1rem;
+            box-shadow: 0 1rem 3rem rgba(0,0,0,.175);
+        }
+
+        .login-card .card-header {
+            text-align: center;
+            background: transparent;
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .login-card .card-body {
+            padding: 2rem;
+        }
+
+        .company-logo {
+            width: 60px;
+            height: 60px;
+            background-color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 991.98px) {
+            .sidebar {
+                width: 100%;
+                transform: translateX(-100%);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .mobile-menu-btn {
+                display: none;
+            }
+        }
+
+        .navbar-toggler {
+            border: none;
+            padding: 0.25rem 0.5rem;
+        }
+
+        .navbar-toggler:focus {
+            box-shadow: none;
+        }
+
+        .table-actions {
+            white-space: nowrap;
+        }
+
+        .stat-icon-blue {
+            background-color: rgba(13, 110, 253, 0.1);
+            color: var(--primary-color);
+        }
+
+        .stat-icon-green {
+            background-color: rgba(25, 135, 84, 0.1);
+            color: var(--success-color);
+        }
+
+        .stat-icon-yellow {
+            background-color: rgba(255, 193, 7, 0.1);
+            color: var(--warning-color);
+        }
+
+        .stat-icon-purple {
+            background-color: rgba(111, 66, 193, 0.1);
+            color: #6f42c1;
+        }
+
+        .stat-icon-red {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: var(--danger-color);
+        }
+
+        .shortcut-btn {
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            width: 100%;
+            text-align: left;
+        }
+
+        .shortcut-btn i {
+            margin-right: 0.5rem;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 0.2em solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="card login-card">
+            <div class="card-header">
+                <div class="company-logo">KP</div>
+                <h4 class="mb-0">Kenya Payroll System</h4>
+                <p class="text-muted small">Sign in to your account</p>
+            </div>
+            <div class="card-body">
+                <form id="loginForm">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="email" placeholder="name@example.com" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" placeholder="Password" required>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="rememberMe">
+                        <label class="form-check-label" for="rememberMe">
+                            Remember me
+                        </label>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Sign in</button>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="#" class="text-decoration-none">Forgot password?</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" style="display: none;">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
+            <div class="container-fluid">
+                <button class="navbar-toggler mobile-menu-btn" type="button" id="menuToggle">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <a class="navbar-brand" href="#">Kenya Payroll System</a>
+                <div class="ms-auto d-flex align-items-center">
+                    <span class="me-3" id="userName">Admin</span>
+                    <button class="btn btn-outline-danger btn-sm" id="logoutBtn">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-page="dashboard">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="employees">
+                            <i class="bi bi-people"></i> Employees
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="payroll">
+                            <i class="bi bi-cash-stack"></i> Payroll
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="reports">
+                            <i class="bi bi-file-earmark-bar-graph"></i> Reports
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="settings">
+                            <i class="bi bi-gear"></i> Settings
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Page -->
+            <div id="dashboardPage" class="page-content fade-in">
+                <h1 class="page-title">Dashboard</h1>
+                
+                <!-- Quick Stats -->
+                <div class="row mb-4">
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card stats-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-box stat-icon-blue me-3">
+                                        <i class="bi bi-people-fill"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="text-muted mb-1">Total Employees</h6>
+                                        <h4 class="mb-0" id="totalEmployees">24</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card stats-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-box stat-icon-green me-3">
+                                        <i class="bi bi-cash"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="text-muted mb-1">This Month Payroll</h6>
+                                        <h4 class="mb-0" id="payrollTotal">KES 1,240,500</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card stats-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-box stat-icon-yellow me-3">
+                                        <i class="bi bi-shield-check"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="text-muted mb-1">Total PAYE</h6>
+                                        <h4 class="mb-0" id="totalPAYE">KES 185,200</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card stats-card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-box stat-icon-purple me-3">
+                                        <i class="bi bi-credit-card"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="text-muted mb-1">Total NHIF/NSSF</h6>
+                                        <h4 class="mb-0" id="totalNHIFNSSF">KES 42,600</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shortcuts -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Shortcuts</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <button class="btn btn-primary shortcut-btn" data-page="payroll">
+                                    <i class="bi bi-calculator"></i> Run Payroll
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-success shortcut-btn" data-page="employees" data-action="add">
+                                    <i class="bi bi-person-plus"></i> Add Employee
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-info shortcut-btn" data-page="reports">
+                                    <i class="bi bi-file-earmark-text"></i> Generate Reports
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Employees Page -->
+            <div id="employeesPage" class="page-content" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="page-title">Employees</h1>
+                    <button class="btn btn-primary" id="addEmployeeBtn">
+                        <i class="bi bi-plus-circle"></i> Add New Employee
+                    </button>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                    <input type="text" class="form-control" id="employeeSearch" placeholder="Search by name, ID, or position...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Employees Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>ID</th>
+                                        <th>Position</th>
+                                        <th>Basic Salary</th>
+                                        <th>Bank/M-Pesa</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="employeesTableBody">
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-circle me-2">JD</div>
+                                                <div>John Doe</div>
+                                            </div>
+                                        </td>
+                                        <td>EMP001</td>
+                                        <td>Software Developer</td>
+                                        <td>KES 85,000</td>
+                                        <td>Bank</td>
+                                        <td class="table-actions">
+                                            <button class="btn btn-sm btn-outline-primary view-employee-btn"><i class="bi bi-eye"></i></button>
+                                            <button class="btn btn-sm btn-outline-secondary edit-employee-btn"><i class="bi bi-pencil"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger delete-employee-btn"><i class="bi bi-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-circle me-2">AS</div>
+                                                <div>Anne Smith</div>
+                                            </div>
+                                        </td>
+                                        <td>EMP002</td>
+                                        <td>HR Manager</td>
+                                        <td>KES 75,000</td>
+                                        <td>Bank</td>
+                                        <td class="table-actions">
+                                            <button class="btn btn-sm btn-outline-primary view-employee-btn"><i class="bi bi-eye"></i></button>
+                                            <button class="btn btn-sm btn-outline-secondary edit-employee-btn"><i class="bi bi-pencil"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger delete-employee-btn"><i class="bi bi-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-circle me-2">MJ</div>
+                                                <div>Michael Johnson</div>
+                                            </div>
+                                        </td>
+                                        <td>EMP003</td>
+                                        <td>Accountant</td>
+                                        <td>KES 65,000</td>
+                                        <td>M-Pesa</td>
+                                        <td class="table-actions">
+                                            <button class="btn btn-sm btn-outline-primary view-employee-btn"><i class="bi bi-eye"></i></button>
+                                            <button class="btn btn-sm btn-outline-secondary edit-employee-btn"><i class="bi bi-pencil"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger delete-employee-btn"><i class="bi bi-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payroll Page -->
+            <div id="payrollPage" class="page-content" style="display: none;">
+                <h1 class="page-title">Payroll</h1>
+                
+                <!-- Month Selector -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-4">
+                                <label for="payrollMonth" class="form-label">Month</label>
+                                <select class="form-select" id="payrollMonth">
+                                    <option value="0">January</option>
+                                    <option value="1">February</option>
+                                    <option value="2">March</option>
+                                    <option value="3">April</option>
+                                    <option value="4">May</option>
+                                    <option value="5">June</option>
+                                    <option value="6">July</option>
+                                    <option value="7">August</option>
+                                    <option value="8">September</option>
+                                    <option value="9">October</option>
+                                    <option value="10">November</option>
+                                    <option value="11" selected>December</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="payrollYear" class="form-label">Year</label>
+                                <select class="form-select" id="payrollYear">
+                                    <option value="2023" selected>2023</option>
+                                    <option value="2022">2022</option>
+                                    <option value="2021">2021</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button class="btn btn-primary w-100" id="generatePayrollBtn">
+                                    <i class="bi bi-calculator"></i> Generate Payroll
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payroll Table -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Payroll Summary</h5>
+                        <div>
+                            <button class="btn btn-sm btn-outline-success me-2" id="exportExcelBtn">
+                                <i class="bi bi-file-earmark-excel"></i> Export to Excel
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary" id="sendPayslipsBtn">
+                                <i class="bi bi-envelope"></i> Send Payslips
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Employee</th>
+                                        <th>Basic</th>
+                                        <th>Overtime</th>
+                                        <th>Allowances</th>
+                                        <th>Loan</th>
+                                        <th>Sacco</th>
+                                        <th>Pension</th>
+                                        <th>Insurance</th>
+                                        <th>PAYE</th>
+                                        <th>NHIF</th>
+                                        <th>NSSF</th>
+                                        <th>Net Pay</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="payrollTableBody">
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-circle me-2">JD</div>
+                                                <div>John Doe</div>
+                                            </div>
+                                        </td>
+                                        <td>KES 85,000</td>
+                                        <td>KES 5,000</td>
+                                        <td>KES 10,000</td>
+                                        <td>KES 5,000</td>
+                                        <td>KES 3,000</td>
+                                        <td>KES 5,000</td>
+                                        <td>KES 2,000</td>
+                                        <td>KES 18,750</td>
+                                        <td>KES 1,700</td>
+                                        <td>KES 2,000</td>
+                                        <td>KES 62,550</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary payslip-btn"><i class="bi bi-file-earmark-pdf"></i> Payslip</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-circle me-2">AS</div>
+                                                <div>Anne Smith</div>
+                                            </div>
+                                        </td>
+                                        <td>KES 75,000</td>
+                                        <td>KES 0</td>
+                                        <td>KES 8,000</td>
+                                        <td>KES 0</td>
+                                        <td>KES 2,500</td>
+                                        <td>KES 4,000</td>
+                                        <td>KES 1,500</td>
+                                        <td>KES 15,750</td>
+                                        <td>KES 1,500</td>
+                                        <td>KES 1,800</td>
+                                        <td>KES 56,450</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary payslip-btn"><i class="bi bi-file-earmark-pdf"></i> Payslip</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-circle me-2">MJ</div>
+                                                <div>Michael Johnson</div>
+                                            </div>
+                                        </td>
+                                        <td>KES 65,000</td>
+                                        <td>KES 3,000</td>
+                                        <td>KES 7,000</td>
+                                        <td>KES 2,000</td>
+                                        <td>KES 2,000</td>
+                                        <td>KES 3,500</td>
+                                        <td>KES 1,000</td>
+                                        <td>KES 13,125</td>
+                                        <td>KES 1,350</td>
+                                        <td>KES 1,560</td>
+                                        <td>KES 52,465</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary payslip-btn"><i class="bi bi-file-earmark-pdf"></i> Payslip</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Page -->
+            <div id="reportsPage" class="page-content" style="display: none;">
+                <h1 class="page-title">Reports</h1>
+                
+                <!-- Filters -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label for="reportMonth" class="form-label">Month</label>
+                                <select class="form-select" id="reportMonth">
+                                    <option value="0">January</option>
+                                    <option value="1">February</option>
+                                    <option value="2">March</option>
+                                    <option value="3">April</option>
+                                    <option value="4">May</option>
+                                    <option value="5">June</option>
+                                    <option value="6">July</option>
+                                    <option value="7">August</option>
+                                    <option value="8">September</option>
+                                    <option value="9">October</option>
+                                    <option value="10">November</option>
+                                    <option value="11" selected>December</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="reportYear" class="form-label">Year</label>
+                                <select class="form-select" id="reportYear">
+                                    <option value="2023" selected>2023</option>
+                                    <option value="2022">2022</option>
+                                    <option value="2021">2021</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="reportDepartment" class="form-label">Department</label>
+                                <select class="form-select" id="reportDepartment">
+                                    <option value="All" selected>All Departments</option>
+                                    <option value="IT">IT</option>
+                                    <option value="HR">HR</option>
+                                    <option value="Finance">Finance</option>
+                                    <option value="Operations">Operations</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Payroll Breakdown</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="payrollBreakdownChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Department Salary Distribution</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="departmentDistributionChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Download Buttons -->
+                <div class="card">
+                    <div class="card-body d-flex justify-content-end">
+                        <button class="btn btn-outline-danger me-2" id="downloadPdfBtn">
+                            <i class="bi bi-file-earmark-pdf"></i> Download PDF
+                        </button>
+                        <button class="btn btn-outline-success" id="downloadExcelBtn">
+                            <i class="bi bi-file-earmark-excel"></i> Download Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div id="settingsPage" class="page-content" style="display: none;">
+                <h1 class="page-title">Settings</h1>
+                
+                <!-- Company Info -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Company Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="companyName" class="form-label">Company Name</label>
+                                    <input type="text" class="form-control" id="companyName" value="Kenya Payroll System">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="overtimeRate" class="form-label">Overtime Rate</label>
+                                    <input type="number" class="form-control" id="overtimeRate" value="1.5" step="0.1">
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label for="companyAddress" class="form-label">Company Address</label>
+                                    <textarea class="form-control" id="companyAddress" rows="2">Nairobi, Kenya</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payroll Rules -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Payroll Rules</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- PAYE Tax Brackets -->
+                        <h6 class="mb-3">PAYE Tax Brackets</h6>
+                        <div class="table-responsive mb-4">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Min Amount (KES)</th>
+                                        <th>Max Amount (KES)</th>
+                                        <th>Rate (%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input type="number" class="form-control form-control-sm" value="0"></td>
+                                        <td><input type="number" class="form-control form-control-sm" value="24000"></td>
+                                        <td><input type="number" class="form-control form-control-sm" value="10" step="0.1"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="number" class="form-control form-control-sm" value="24001"></td>
+                                        <td><input type="number" class="form-control form-control-sm" value="32333"></td>
+                                        <td><input type="number" class="form-control form-control-sm" value="25" step="0.1"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="number" class="form-control form-control-sm" value="32334"></td>
+                                        <td><input type="number" class="form-control form-control-sm" value="500000"></td>
+                                        <td><input type="number" class="form-control form-control-sm" value="30" step="0.1"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- NHIF Rates -->
+                        <h6 class="mb-3">NHIF Deduction Rates</h6>
+                        <div class="table-responsive mb-4">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Min Salary (KES)</th>
+                                        <th>Max Salary (KES)</th>
+                                        <th>Employee Contribution (KES)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input type="number" class="form-control form-control-sm" value="0"></td>
+                                        <td><input type="number" class="form-control form-control-sm" value="5999"></td>
+                                        <td><input type="number" class="form-control form-control-sm" value="150"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="number" class="form-control form-control-sm" value="6000"></td>
+                                        <td><input type="number" class="form-control form-control-sm" value="7999"></td>
+                                        <td><input type="number" class="form-control form-control-sm" value="300"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="number" class="form-control form-control-sm" value="8000"></td>
+                                        <td><input type="number" class="form-control form-control-sm" value="11999"></td>
+                                        <td><input type="number" class="form-control form-control-sm" value="400"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- NSSF Rates -->
+                        <h6 class="mb-3">NSSF Rates</h6>
+                        <div class="table-responsive mb-4">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Tier</th>
+                                        <th>Min Amount (KES)</th>
+                                        <th>Max Amount (KES)</th>
+                                        <th>Employee Rate (%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input type="number" class="form-control form-control-sm" value="1"></td>
+                                        <td><input type="number" class="form-control form-control-sm" value="0"></td>
+                                        <td><input type="number" class="form-control form-control-sm" value="7000"></td>
+                                        <td><input type="number" class="form-control form-control-sm" value="6" step="0.1"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="number" class="form-control form-control-sm" value="2"></td>
+                                        <td><input type="number" class="form-control form-control-sm" value="7001"></td>
+                                        <td><input type="number" class="form-control form-control-sm" value="36000"></td>
+                                        <td><input type="number" class="form-control form-control-sm" value="6" step="0.1"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pension Rate -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="pensionRate" class="form-label">Pension Rate (%)</label>
+                                    <input type="number" class="form-control" id="pensionRate" value="0" step="0.1">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users & Roles -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Users & Roles</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive mb-3">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>System Admin</td>
+                                        <td>admin@kenyapayroll.com</td>
+                                        <td><span class="badge bg-primary">Admin</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary me-1">Edit</button>
+                                            <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>HR Manager</td>
+                                        <td>hr@kenyapayroll.com</td>
+                                        <td><span class="badge bg-success">HR</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary me-1">Edit</button>
+                                            <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button class="btn btn-success me-2" id="addHRManagerBtn">
+                                <i class="bi bi-person-plus"></i> Add HR Manager
+                            </button>
+                            <button class="btn btn-primary" id="addAdminBtn">
+                                <i class="bi bi-person-plus"></i> Add Admin
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save/Cancel Buttons -->
+                <div class="d-flex justify-content-end">
+                    <button class="btn btn-outline-secondary me-2" id="cancelSettingsBtn">Cancel</button>
+                    <button class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Employee Modal -->
+    <div class="modal fade" id="employeeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="employeeModalTitle">Add Employee</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="employeeForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="employeeName" class="form-label">Name</label>
+                                    <input type="text" class="form-control" id="employeeName" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="employeeID" class="form-label">Employee ID</label>
+                                    <input type="text" class="form-control" id="employeeID" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="employeePosition" class="form-label">Position</label>
+                                    <input type="text" class="form-control" id="employeePosition" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="basicSalary" class="form-label">Basic Salary (KES)</label>
+                                    <input type="number" class="form-control" id="basicSalary" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="allowances" class="form-label">Allowances (KES)</label>
+                                    <input type="number" class="form-control" id="allowances" value="0">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="bankDetails" class="form-label">Bank Details</label>
+                                    <input type="text" class="form-control" id="bankDetails">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="mpesaDetails" class="form-label">M-Pesa Details</label>
+                                    <input type="text" class="form-control" id="mpesaDetails">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h6 class="mt-4 mb-3">Deductions</h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="loanRepayment" class="form-label">Loan Repayment (KES)</label>
+                                    <input type="number" class="form-control" id="loanRepayment" value="0">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="salaryAdvance" class="form-label">Salary Advance (KES)</label>
+                                    <input type="number" class="form-control" id="salaryAdvance" value="0">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="saccoContribution" class="form-label">Sacco Contribution (KES)</label>
+                                    <input type="number" class="form-control" id="saccoContribution" value="0">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="pensionContribution" class="form-label">Pension Contribution (KES)</label>
+                                    <input type="number" class="form-control" id="pensionContribution" value="0">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="insuranceWelfare" class="form-label">Insurance/Welfare (KES)</label>
+                                    <input type="number" class="form-control" id="insuranceWelfare" value="0">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h6 class="mt-4 mb-3">Statutory Deductions</h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="paye" class="form-label">PAYE (KES)</label>
+                                    <input type="text" class="form-control" id="paye" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="nhif" class="form-label">NHIF (KES)</label>
+                                    <input type="text" class="form-control" id="nhif" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="nssf" class="form-label">NSSF (KES)</label>
+                                    <input type="text" class="form-control" id="nssf" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveEmployeeBtn">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // DOM Elements
+        const loginPage = document.getElementById('loginPage');
+        const mainApp = document.getElementById('mainApp');
+        const loginForm = document.getElementById('loginForm');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const sidebar = document.getElementById('sidebar');
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const pageContents = document.querySelectorAll('.page-content');
+        const employeeModal = new bootstrap.Modal(document.getElementById('employeeModal'));
+        const employeeModalTitle = document.getElementById('employeeModalTitle');
+        const employeeForm = document.getElementById('employeeForm');
+        const saveEmployeeBtn = document.getElementById('saveEmployeeBtn');
+        const basicSalaryInput = document.getElementById('basicSalary');
+        const payeInput = document.getElementById('paye');
+        const nhifInput = document.getElementById('nhif');
+        const nssfInput = document.getElementById('nssf');
+        const addEmployeeBtn = document.getElementById('addEmployeeBtn');
+        const generatePayrollBtn = document.getElementById('generatePayrollBtn');
+        const payslipBtns = document.querySelectorAll('.payslip-btn');
+        const exportExcelBtns = document.querySelectorAll('#exportExcelBtn, #downloadExcelBtn');
+        const sendPayslipsBtn = document.getElementById('sendPayslipsBtn');
+        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+        const cancelSettingsBtn = document.getElementById('cancelSettingsBtn');
+        const addHRManagerBtn = document.getElementById('addHRManagerBtn');
+        const addAdminBtn = document.getElementById('addAdminBtn');
+        const employeeSearch = document.getElementById('employeeSearch');
+        const employeesTableBody = document.getElementById('employeesTableBody');
+        const viewEmployeeBtns = document.querySelectorAll('.view-employee-btn');
+        const editEmployeeBtns = document.querySelectorAll('.edit-employee-btn');
+        const deleteEmployeeBtns = document.querySelectorAll('.delete-employee-btn');
+        const shortcutBtns = document.querySelectorAll('.shortcut-btn');
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup event listeners
+            loginForm.addEventListener('submit', handleLogin);
+            logoutBtn.addEventListener('click', handleLogout);
+            menuToggle.addEventListener('click', toggleSidebar);
+            navLinks.forEach(link => {
+                link.addEventListener('click', navigateToPage);
+            });
+            addEmployeeBtn.addEventListener('click', () => openEmployeeModal('add'));
+            saveEmployeeBtn.addEventListener('click', saveEmployee);
+            basicSalaryInput.addEventListener('input', calculateStatutoryDeductions);
+            generatePayrollBtn.addEventListener('click', generatePayroll);
+            payslipBtns.forEach(btn => {
+                btn.addEventListener('click', generatePayslip);
+            });
+            exportExcelBtns.forEach(btn => {
+                btn.addEventListener('click', exportToExcel);
+            });
+            sendPayslipsBtn.addEventListener('click', sendPayslips);
+            downloadPdfBtn.addEventListener('click', downloadPdf);
+            saveSettingsBtn.addEventListener('click', saveSettings);
+            cancelSettingsBtn.addEventListener('click', () => navigateToPage('dashboard'));
+            addHRManagerBtn.addEventListener('click', () => alert('Add HR Manager functionality would be implemented here'));
+            addAdminBtn.addEventListener('click', () => alert('Add Admin functionality would be implemented here'));
+            employeeSearch.addEventListener('input', filterEmployees);
+            viewEmployeeBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const row = e.target.closest('tr');
+                    const employeeName = row.cells[0].textContent.trim();
+                    openEmployeeModal('view', employeeName);
+                });
+            });
+            editEmployeeBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const row = e.target.closest('tr');
+                    const employeeName = row.cells[0].textContent.trim();
+                    openEmployeeModal('edit', employeeName);
+                });
+            });
+            deleteEmployeeBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (confirm('Are you sure you want to delete this employee?')) {
+                        const row = e.target.closest('tr');
+                        row.remove();
+                        alert('Employee deleted successfully');
+                    }
+                });
+            });
+            shortcutBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const page = e.currentTarget.dataset.page;
+                    const action = e.currentTarget.dataset.action;
+                    
+                    if (page) {
+                        navigateToPage({ currentTarget: { dataset: { page } } });
+                        
+                        if (action === 'add' && page === 'employees') {
+                            setTimeout(() => {
+                                openEmployeeModal('add');
+                            }, 300);
+                        }
+                    }
+                });
+            });
+
+            // Initialize charts if reports page is visible
+            if (document.getElementById('reportsPage').style.display !== 'none') {
+                initializeCharts();
+            }
+        });
+
+        // Handle login
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            // Simple validation (in a real app, this would be an API call)
+            if (email && password) {
+                loginPage.style.display = 'none';
+                mainApp.style.display = 'block';
+                
+                // Set user name
+                document.getElementById('userName').textContent = 'Admin';
+                
+                // Store login state if remember me is checked
+                if (rememberMe) {
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('user', 'Admin');
+                }
+            }
+        }
+
+        // Handle logout
+        function handleLogout() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('user');
+            loginPage.style.display = 'flex';
+            mainApp.style.display = 'none';
+            
+            // Reset form
+            loginForm.reset();
+        }
+
+        // Toggle sidebar on mobile
+        function toggleSidebar() {
+            sidebar.classList.toggle('show');
+        }
+
+        // Navigate to page
+        function navigateToPage(e) {
+            e.preventDefault();
+            const page = e.currentTarget.dataset.page;
+            
+            // Hide all pages
+            pageContents.forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Show selected page
+            const selectedPage = document.getElementById(`${page}Page`);
+            if (selectedPage) {
+                selectedPage.style.display = 'block';
+                selectedPage.classList.add('fade-in');
+            }
+            
+            // Update active nav link
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+            });
+            e.currentTarget.classList.add('active');
+            
+            // Initialize charts if reports page
+            if (page === 'reports') {
+                setTimeout(() => {
+                    initializeCharts();
+                }, 100);
+            }
+            
+            // Close sidebar on mobile after navigation
+            if (window.innerWidth < 992) {
+                sidebar.classList.remove('show');
+            }
+        }
+
+        // Open employee modal
+        function openEmployeeModal(mode, employeeName = '') {
+            // Reset form
+            employeeForm.reset();
+            
+            // Update modal title
+            if (mode === 'add') {
+                employeeModalTitle.textContent = 'Add New Employee';
+                // Enable form inputs
+                employeeForm.querySelectorAll('input').forEach(input => {
+                    input.removeAttribute('readonly');
+                });
+            } else if (mode === 'edit') {
+                employeeModalTitle.textContent = 'Edit Employee';
+                // Enable form inputs
+                employeeForm.querySelectorAll('input').forEach(input => {
+                    input.removeAttribute('readonly');
+                });
+                // In a real app, we would fetch employee data here
+                document.getElementById('employeeName').value = employeeName || 'John Doe';
+                document.getElementById('employeeID').value = 'EMP001';
+                document.getElementById('employeePosition').value = 'Software Developer';
+                document.getElementById('basicSalary').value = '85000';
+                calculateStatutoryDeductions();
+            } else if (mode === 'view') {
+                employeeModalTitle.textContent = 'Employee Details';
+                // Disable form inputs
+                employeeForm.querySelectorAll('input').forEach(input => {
+                    input.setAttribute('readonly', true);
+                });
+                // In a real app, we would fetch employee data here
+                document.getElementById('employeeName').value = employeeName || 'John Doe';
+                document.getElementById('employeeID').value = 'EMP001';
+                document.getElementById('employeePosition').value = 'Software Developer';
+                document.getElementById('basicSalary').value = '85000';
+                calculateStatutoryDeductions();
+            }
+            
+            // Show modal
+            employeeModal.show();
+        }
+
+        // Save employee
+        function saveEmployee() {
+            // In a real app, this would save to a database
+            alert('Employee saved successfully!');
+            employeeModal.hide();
+        }
+
+        // Calculate statutory deductions
+        function calculateStatutoryDeductions() {
+            const basicSalary = parseFloat(basicSalaryInput.value) || 0;
+            
+            // Simple PAYE calculation (not accurate, just for demo)
+            let paye = 0;
+            if (basicSalary > 24000) {
+                paye = (basicSalary - 24000) * 0.25;
+            }
+            
+            // Simple NHIF calculation (not accurate, just for demo)
+            let nhif = 0;
+            if (basicSalary > 0) {
+                nhif = 1700; // Max NHIF
+            }
+            
+            // Simple NSSF calculation (not accurate, just for demo)
+            let nssf = Math.min(basicSalary * 0.06, 2000);
+            
+            // Update inputs
+            payeInput.value = paye.toFixed(2);
+            nhifInput.value = nhif.toFixed(2);
+            nssfInput.value = nssf.toFixed(2);
+        }
+
+        // Generate payroll
+        function generatePayroll() {
+            // In a real app, this would generate payroll for all employees
+            alert('Payroll generated successfully!');
+        }
+
+        // Generate payslip
+        function generatePayslip(e) {
+            e.preventDefault();
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Company info
+            const companyName = "Kenya Payroll System";
+            const companyAddress = "Nairobi, Kenya";
+            
+            // Get employee row
+            const row = e.target.closest('tr');
+            const employeeName = row.cells[0].textContent.trim();
+            
+            // Header
+            doc.setFontSize(18);
+            doc.text(companyName, 105, 15, { align: 'center' });
+            doc.setFontSize(10);
+            doc.text(companyAddress, 105, 22, { align: 'center' });
+            
+            // Title
+            doc.setFontSize(14);
+            doc.text('PAYSLIP FOR DECEMBER 2023', 105, 35, { align: 'center' });
+            
+            // Employee details
+            doc.setFontSize(12);
+            doc.text(`Employee Name: ${employeeName}`, 20, 50);
+            doc.text(`Employee ID: EMP001`, 20, 57);
+            doc.text(`Position: Software Developer`, 20, 64);
+            
+            // Earnings
+            doc.setFontSize(12);
+            doc.text('EARNINGS', 20, 80);
+            doc.setFontSize(10);
+            doc.text(`Basic Salary: KES 85,000`, 25, 90);
+            doc.text(`Allowances: KES 10,000`, 25, 97);
+            doc.text(`Overtime: KES 5,000`, 25, 104);
+            
+            // Total earnings
+            doc.text(`Total Earnings: KES 100,000`, 25, 115);
+            
+            // Deductions
+            doc.setFontSize(12);
+            doc.text('DEDUCTIONS', 20, 130);
+            doc.setFontSize(10);
+            doc.text(`PAYE: KES 18,750`, 25, 140);
+            doc.text(`NHIF: KES 1,700`, 25, 147);
+            doc.text(`NSSF: KES 2,000`, 25, 154);
+            doc.text(`Loan Repayment: KES 5,000`, 25, 161);
+            doc.text(`Sacco Contribution: KES 3,000`, 25, 168);
+            doc.text(`Pension Contribution: KES 5,000`, 25, 175);
+            doc.text(`Insurance/Welfare: KES 2,000`, 25, 182);
+            
+            // Total deductions
+            doc.text(`Total Deductions: KES 37,450`, 25, 195);
+            
+            // Net pay
+            doc.setFontSize(12);
+            doc.text(`NET PAY: KES 62,550`, 105, 210, { align: 'center' });
+            
+            // Save the PDF
+            doc.save(`payslip_${employeeName}_December_2023.pdf`);
+        }
+
+        // Export to Excel
+        function exportToExcel() {
+            // In a real app, this would generate an Excel file
+            alert('Excel export functionality would be implemented here');
+        }
+
+        // Send payslips
+        function sendPayslips() {
+            // In a real app, this would send payslips via email
+            alert('Payslips sent successfully!');
+        }
+
+        // Download PDF
+        function downloadPdf() {
+            // In a real app, this would generate a PDF report
+            alert('PDF download functionality would be implemented here');
+        }
+
+        // Save settings
+        function saveSettings() {
+            // In a real app, this would save settings to a database
+            alert('Settings saved successfully!');
+        }
+
+        // Filter employees
+        function filterEmployees() {
+            const searchTerm = employeeSearch.value.toLowerCase();
+            const rows = employeesTableBody.querySelectorAll('tr');
+            
+            rows.forEach(row => {
+                const name = row.cells[0].textContent.toLowerCase();
+                const id = row.cells[1].textContent.toLowerCase();
+                const position = row.cells[2].textContent.toLowerCase();
+                
+                if (name.includes(searchTerm) || id.includes(searchTerm) || position.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Initialize charts
+        function initializeCharts() {
+            // Payroll Breakdown Chart
+            const payrollBreakdownCtx = document.getElementById('payrollBreakdownChart');
+            if (payrollBreakdownCtx) {
+                new Chart(payrollBreakdownCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Salaries', 'Taxes (PAYE)', 'Deductions'],
+                        datasets: [{
+                            label: 'Amount (KES)',
+                            data: [1200000, 185200, 42600],
+                            backgroundColor: [
+                                'rgba(54, 162, 235, 0.7)',
+                                'rgba(255, 99, 132, 0.7)',
+                                'rgba(75, 192, 192, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(75, 192, 192, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return 'KES ' + value.toLocaleString();
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.dataset.label + ': KES ' + context.raw.toLocaleString();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Department Distribution Chart
+            const departmentDistributionCtx = document.getElementById('departmentDistributionChart');
+            if (departmentDistributionCtx) {
+                new Chart(departmentDistributionCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['IT', 'HR', 'Finance', 'Operations'],
+                        datasets: [{
+                            data: [450000, 320000, 280000, 190000],
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.7)',
+                                'rgba(54, 162, 235, 0.7)',
+                                'rgba(255, 206, 86, 0.7)',
+                                'rgba(75, 192, 192, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.raw || 0;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = Math.round((value / total) * 100);
+                                        return label + ': KES ' + value.toLocaleString() + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Check if user is already logged in
+        window.addEventListener('load', function() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const user = localStorage.getItem('user');
+            
+            if (isLoggedIn === 'true' && user) {
+                loginPage.style.display = 'none';
+                mainApp.style.display = 'block';
+                document.getElementById('userName').textContent = user;
+            }
+        });
+    </script>
+</body>
+</html>
