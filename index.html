@@ -3,1617 +3,1814 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kenya Payroll System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <title>Kenya Payroll Management System</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        :root {
-            --primary-color: #0d6efd;
-            --secondary-color: #6c757d;
-            --success-color: #198754;
-            --info-color: #0dcaf0;
-            --warning-color: #ffc107;
-            --danger-color: #dc3545;
-            --light-color: #f8f9fa;
-            --dark-color: #212529;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
-
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
+            background-color: #f3f4f6;
+            color: #1f2937;
+            line-height: 1.6;
         }
-
-        .sidebar {
-            position: fixed;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            z-index: 100;
-            padding: 48px 0 0;
-            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
-            background-color: #fff;
-            width: 280px;
-            transition: all 0.3s;
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
         }
-
-        .sidebar-sticky {
-            position: sticky;
-            top: 48px;
-            height: calc(100vh - 48px);
-            padding-top: .5rem;
-            overflow-x: hidden;
-            overflow-y: auto;
+        
+        .min-h-screen {
+            min-height: 100vh;
         }
-
-        .sidebar .nav-link {
-            color: #333;
-            padding: 0.75rem 1rem;
-            border-radius: 0.25rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .sidebar .nav-link:hover {
-            background-color: #f8f9fa;
-        }
-
-        .sidebar .nav-link.active {
-            color: #fff;
-            background-color: var(--primary-color);
-        }
-
-        .sidebar .nav-link i {
-            margin-right: 0.5rem;
-        }
-
-        .navbar {
-            box-shadow: 0 2px 4px rgba(0,0,0,.1);
-        }
-
-        .navbar-brand {
-            font-weight: 700;
-        }
-
-        .stats-card {
-            border-radius: 0.5rem;
-            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
-            border: 1px solid rgba(0,0,0,.125);
-            transition: transform 0.2s;
-        }
-
-        .stats-card:hover {
-            transform: translateY(-3px);
-        }
-
-        .stats-card .card-body {
-            padding: 1.25rem;
-        }
-
-        .stats-card .icon-box {
-            width: 48px;
-            height: 48px;
-            border-radius: 0.5rem;
+        
+        .flex {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
         }
-
-        .main-content {
-            margin-left: 280px;
+        
+        .items-center {
+            align-items: center;
+        }
+        
+        .justify-center {
+            justify-content: center;
+        }
+        
+        .justify-between {
+            justify-content: space-between;
+        }
+        
+        .p-4 {
+            padding: 1rem;
+        }
+        
+        .p-6 {
             padding: 1.5rem;
         }
-
-        .page-title {
-            font-size: 1.75rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            color: #333;
-        }
-
-        .card {
-            border-radius: 0.5rem;
-            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
-            border: 1px solid rgba(0,0,0,.125);
-            margin-bottom: 1.5rem;
-        }
-
-        .card-header {
-            background-color: #fff;
-            border-bottom: 1px solid rgba(0,0,0,.125);
-            font-weight: 600;
-        }
-
-        .table th {
-            border-top: none;
-            font-weight: 600;
-            color: #495057;
-        }
-
-        .btn-action {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.875rem;
-            margin-right: 0.25rem;
-        }
-
-        .modal-header {
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
-        }
-
-        .form-label {
-            font-weight: 500;
-            margin-bottom: 0.25rem;
-        }
-
-        .form-control:focus, .form-select:focus {
-            border-color: #86b7fe;
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-        }
-
-        .chart-container {
-            position: relative;
-            height: 300px;
-            width: 100%;
-        }
-
-        .login-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
-        }
-
-        .login-card {
-            width: 100%;
-            max-width: 420px;
-            border-radius: 1rem;
-            box-shadow: 0 1rem 3rem rgba(0,0,0,.175);
-        }
-
-        .login-card .card-header {
-            text-align: center;
-            background: transparent;
-            border-bottom: none;
-            padding-bottom: 0;
-        }
-
-        .login-card .card-body {
+        
+        .p-8 {
             padding: 2rem;
         }
-
-        .company-logo {
-            width: 60px;
-            height: 60px;
-            background-color: #fff;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
+        
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+        
+        .mb-6 {
+            margin-bottom: 1.5rem;
+        }
+        
+        .mb-8 {
+            margin-bottom: 2rem;
+        }
+        
+        .mt-6 {
+            margin-top: 1.5rem;
+        }
+        
+        .w-full {
+            width: 100%;
+        }
+        
+        .w-16 {
+            width: 4rem;
+        }
+        
+        .h-16 {
+            height: 4rem;
+        }
+        
+        .w-8 {
+            width: 2rem;
+        }
+        
+        .h-8 {
+            height: 2rem;
+        }
+        
+        .w-4 {
+            width: 1rem;
+        }
+        
+        .h-4 {
+            height: 1rem;
+        }
+        
+        .w-6 {
+            width: 1.5rem;
+        }
+        
+        .h-6 {
+            height: 1.5rem;
+        }
+        
+        .w-5 {
+            width: 1.25rem;
+        }
+        
+        .h-5 {
+            height: 1.25rem;
+        }
+        
+        .rounded {
+            border-radius: 0.25rem;
+        }
+        
+        .rounded-lg {
+            border-radius: 0.5rem;
+        }
+        
+        .rounded-md {
+            border-radius: 0.375rem;
+        }
+        
+        .rounded-full {
+            border-radius: 9999px;
+        }
+        
+        .bg-white {
+            background-color: #ffffff;
+        }
+        
+        .bg-blue-600 {
+            background-color: #2563eb;
+        }
+        
+        .bg-blue-700 {
+            background-color: #1d4ed8;
+        }
+        
+        .bg-blue-800 {
+            background-color: #1e40af;
+        }
+        
+        .bg-blue-900 {
+            background-color: #1e3a8a;
+        }
+        
+        .bg-gray-50 {
+            background-color: #f9fafb;
+        }
+        
+        .bg-gray-100 {
+            background-color: #f3f4f6;
+        }
+        
+        .bg-green-600 {
+            background-color: #16a34a;
+        }
+        
+        .bg-purple-600 {
+            background-color: #9333ea;
+        }
+        
+        .bg-red-600 {
+            background-color: #dc2626;
+        }
+        
+        .bg-orange-600 {
+            background-color: #ea580c;
+        }
+        
+        .text-white {
+            color: #ffffff;
+        }
+        
+        .text-gray-500 {
+            color: #6b7280;
+        }
+        
+        .text-gray-600 {
+            color: #4b5563;
+        }
+        
+        .text-gray-700 {
+            color: #374151;
+        }
+        
+        .text-gray-900 {
+            color: #111827;
+        }
+        
+        .text-blue-600 {
+            color: #2563eb;
+        }
+        
+        .text-green-600 {
+            color: #16a34a;
+        }
+        
+        .text-purple-600 {
+            color: #9333ea;
+        }
+        
+        .text-red-600 {
+            color: #dc2626;
+        }
+        
+        .text-orange-600 {
+            color: #ea580c;
+        }
+        
+        .text-sm {
+            font-size: 0.875rem;
+        }
+        
+        .text-lg {
+            font-size: 1.125rem;
+        }
+        
+        .text-xl {
+            font-size: 1.25rem;
+        }
+        
+        .text-2xl {
             font-size: 1.5rem;
+        }
+        
+        .text-3xl {
+            font-size: 1.875rem;
+        }
+        
+        .font-bold {
             font-weight: 700;
-            color: var(--primary-color);
         }
-
-        @media (max-width: 991.98px) {
-            .sidebar {
-                width: 100%;
-                transform: translateX(-100%);
-            }
-
-            .sidebar.show {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-
-            .mobile-menu-btn {
-                display: block;
-            }
+        
+        .font-medium {
+            font-weight: 500;
         }
-
-        @media (min-width: 992px) {
-            .mobile-menu-btn {
-                display: none;
-            }
+        
+        .shadow {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
         }
-
-        .navbar-toggler {
-            border: none;
-            padding: 0.25rem 0.5rem;
+        
+        .shadow-2xl {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
-
-        .navbar-toggler:focus {
-            box-shadow: none;
+        
+        .border {
+            border-width: 1px;
         }
-
-        .table-actions {
+        
+        .border-gray-300 {
+            border-color: #d1d5db;
+        }
+        
+        .border-gray-200 {
+            border-color: #e5e7eb;
+        }
+        
+        .focus\:outline-none:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+        }
+        
+        .focus\:ring-2:focus {
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.5);
+        }
+        
+        .focus\:ring-blue-500:focus {
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+        }
+        
+        .hover\:bg-blue-700:hover {
+            background-color: #1d4ed8;
+        }
+        
+        .hover\:bg-blue-900:hover {
+            background-color: #1e3a8a;
+        }
+        
+        .hover\:bg-green-700:hover {
+            background-color: #15803d;
+        }
+        
+        .hover\:bg-purple-700:hover {
+            background-color: #7e22ce;
+        }
+        
+        .hover\:bg-gray-700:hover {
+            background-color: #374151;
+        }
+        
+        .hover\:bg-red-900:hover {
+            background-color: #7f1d1d;
+        }
+        
+        .hover\:underline:hover {
+            text-decoration: underline;
+        }
+        
+        .hover\:text-blue-900:hover {
+            color: #1e3a8a;
+        }
+        
+        .hover\:text-green-900:hover {
+            color: #14532d;
+        }
+        
+        .hover\:text-red-900:hover {
+            color: #7f1d1d;
+        }
+        
+        .transition {
+            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms;
+        }
+        
+        .duration-200 {
+            transition-duration: 200ms;
+        }
+        
+        .whitespace-nowrap {
             white-space: nowrap;
         }
-
-        .stat-icon-blue {
-            background-color: rgba(13, 110, 253, 0.1);
-            color: var(--primary-color);
+        
+        .overflow-x-auto {
+            overflow-x: auto;
         }
-
-        .stat-icon-green {
-            background-color: rgba(25, 135, 84, 0.1);
-            color: var(--success-color);
+        
+        .relative {
+            position: relative;
         }
-
-        .stat-icon-yellow {
-            background-color: rgba(255, 193, 7, 0.1);
-            color: var(--warning-color);
+        
+        .absolute {
+            position: absolute;
         }
-
-        .stat-icon-purple {
-            background-color: rgba(111, 66, 193, 0.1);
-            color: #6f42c1;
+        
+        .left-3 {
+            left: 0.75rem;
         }
-
-        .stat-icon-red {
-            background-color: rgba(220, 53, 69, 0.1);
-            color: var(--danger-color);
+        
+        .top-1\/2 {
+            top: 50%;
         }
-
-        .shortcut-btn {
-            border-radius: 0.5rem;
-            padding: 0.75rem 1rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
+        
+        .transform {
+            transform: translateX(var(--tw-translate-x), 0) translateY(var(--tw-translate-y), 0) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+        }
+        
+        .-translate-y-1\/2 {
+            --tw-translate-y: -50%;
+            transform: translateX(var(--tw-translate-x), 0) translateY(var(--tw-translate-y), 0) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+        }
+        
+        .grid {
+            display: grid;
+        }
+        
+        .grid-cols-1 {
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+        }
+        
+        .grid-cols-2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        
+        .grid-cols-3 {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+        
+        .grid-cols-5 {
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+        }
+        
+        .gap-2 {
+            gap: 0.5rem;
+        }
+        
+        .gap-4 {
+            gap: 1rem;
+        }
+        
+        .gap-6 {
+            gap: 1.5rem;
+        }
+        
+        .space-x-2 > * + * {
+            margin-left: 0.5rem;
+        }
+        
+        .space-x-4 > * + * {
+            margin-left: 1rem;
+        }
+        
+        .space-x-6 > * + * {
+            margin-left: 1.5rem;
+        }
+        
+        .space-y-2 > * + * {
+            margin-top: 0.5rem;
+        }
+        
+        .space-y-4 > * + * {
+            margin-top: 1rem;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .md\:flex {
+            display: flex;
+        }
+        
+        .md\:grid-cols-2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        
+        .md\:grid-cols-3 {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+        
+        .md\:col-span-2 {
+            grid-column: span 2 / span 2;
+        }
+        
+        .lg\:grid-cols-2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        
+        .max-w-md {
+            max-width: 28rem;
+        }
+        
+        .max-w-2xl {
+            max-width: 42rem;
+        }
+        
+        .max-w-4xl {
+            max-width: 56rem;
+        }
+        
+        .max-h-\[90vh\] {
+            max-height: 90vh;
+        }
+        
+        .overflow-y-auto {
+            overflow-y: auto;
+        }
+        
+        .z-50 {
+            z-index: 50;
+        }
+        
+        .fixed {
+            position: fixed;
+        }
+        
+        .inset-0 {
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+        
+        .bg-black {
+            background-color: #000;
+        }
+        
+        .bg-opacity-50 {
+            --tw-bg-opacity: 0.5;
+        }
+        
+        .divide-y > * + * {
+            border-top-width: 1px;
+        }
+        
+        .divide-gray-200 > * + * {
+            border-color: #e5e7eb;
+        }
+        
+        table {
             width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
             text-align: left;
         }
-
-        .shortcut-btn i {
+        
+        td, th {
+            padding: 0.75rem 1rem;
+        }
+        
+        .uppercase {
+            text-transform: uppercase;
+        }
+        
+        .tracking-wider {
+            letter-spacing: 0.05em;
+        }
+        
+        .text-xs {
+            font-size: 0.75rem;
+        }
+        
+        .bg-gradient-to-br {
+            background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
+        }
+        
+        .from-blue-900 {
+            --tw-gradient-from: #1e3a8a;
+            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(30, 58, 138, 0));
+        }
+        
+        .to-blue-600 {
+            --tw-gradient-to: #2563eb;
+        }
+        
+        .mx-auto {
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .mb-2 {
+            margin-bottom: 0.5rem;
+        }
+        
+        .mb-3 {
+            margin-bottom: 0.75rem;
+        }
+        
+        .px-3 {
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
+        
+        .py-2 {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+        
+        .px-4 {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        
+        .py-1 {
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
+        }
+        
+        .py-3 {
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+        }
+        
+        .py-4 {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        
+        .pl-10 {
+            padding-left: 2.5rem;
+        }
+        
+        .pr-4 {
+            padding-right: 1rem;
+        }
+        
+        .mr-1 {
+            margin-right: 0.25rem;
+        }
+        
+        .mr-2 {
             margin-right: 0.5rem;
         }
-
-        .fade-in {
-            animation: fadeIn 0.5s;
+        
+        .mr-4 {
+            margin-right: 1rem;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        
+        .ml-2 {
+            margin-left: 0.5rem;
         }
-
-        .loading-spinner {
+        
+        .mt-4 {
+            margin-top: 1rem;
+        }
+        
+        .mt-2 {
+            margin-top: 0.5rem;
+        }
+        
+        .h-64 {
+            height: 16rem;
+        }
+        
+        .rounded {
+            border-radius: 0.25rem;
+        }
+        
+        @media (min-width: 768px) {
+            .md\:flex {
+                display: flex;
+            }
+            
+            .md\:grid-cols-2 {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            
+            .md\:grid-cols-3 {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+            
+            .md\:col-span-2 {
+                grid-column: span 2 / span 2;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .lg\:grid-cols-2 {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+        
+        /* Icon styles */
+        .icon {
             display: inline-block;
-            width: 1rem;
-            height: 1rem;
-            border: 0.2em solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+            width: 1em;
+            height: 1em;
+            stroke-width: 0;
+            stroke: currentColor;
+            fill: currentColor;
+            vertical-align: middle;
         }
     </style>
 </head>
 <body>
-    <!-- Login Page -->
-    <div id="loginPage" class="login-container">
-        <div class="card login-card">
-            <div class="card-header">
-                <div class="company-logo">KP</div>
-                <h4 class="mb-0">Kenya Payroll System</h4>
-                <p class="text-muted small">Sign in to your account</p>
-            </div>
-            <div class="card-body">
-                <form id="loginForm">
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email address</label>
-                        <input type="email" class="form-control" id="email" placeholder="name@example.com" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" placeholder="Password" required>
-                    </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="rememberMe">
-                        <label class="form-check-label" for="rememberMe">
-                            Remember me
-                        </label>
-                    </div>
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Sign in</button>
-                    </div>
-                    <div class="text-center mt-3">
-                        <a href="#" class="text-decoration-none">Forgot password?</a>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+    <div id="root"></div>
 
-    <!-- Main Application -->
-    <div id="mainApp" style="display: none;">
-        <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
-            <div class="container-fluid">
-                <button class="navbar-toggler mobile-menu-btn" type="button" id="menuToggle">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <a class="navbar-brand" href="#">Kenya Payroll System</a>
-                <div class="ms-auto d-flex align-items-center">
-                    <span class="me-3" id="userName">Admin</span>
-                    <button class="btn btn-outline-danger btn-sm" id="logoutBtn">
-                        <i class="bi bi-box-arrow-right"></i> Logout
-                    </button>
-                </div>
-            </div>
-        </nav>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        // Simple icon components to replace Lucide icons
+        const Icon = ({ name, className = "", ...props }) => {
+            const iconMap = {
+                users: "👥",
+                dollar: "💰",
+                file: "📄",
+                settings: "⚙️",
+                logout: "🚪",
+                home: "🏠",
+                plus: "➕",
+                download: "⬇️",
+                search: "🔍",
+                edit: "✏️",
+                trash: "🗑️",
+                eye: "👁️",
+                arrowLeft: "⬅️",
+                building: "🏢",
+                mail: "✉️",
+                phone: "📞",
+                calendar: "📅",
+                filter: "🔽"
+            };
+            
+            return (
+                <span className={`icon ${className}`} {...props}>
+                    {iconMap[name] || "❓"}
+                </span>
+            );
+        };
 
-        <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-sticky">
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#" data-page="dashboard">
-                            <i class="bi bi-speedometer2"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-page="employees">
-                            <i class="bi bi-people"></i> Employees
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-page="payroll">
-                            <i class="bi bi-cash-stack"></i> Payroll
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-page="reports">
-                            <i class="bi bi-file-earmark-bar-graph"></i> Reports
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-page="settings">
-                            <i class="bi bi-gear"></i> Settings
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Dashboard Page -->
-            <div id="dashboardPage" class="page-content fade-in">
-                <h1 class="page-title">Dashboard</h1>
+        // Mock data and calculations
+        const PAYE_BRACKETS = [
+            { min: 0, max: 24000, rate: 10 },
+            { min: 24001, max: 32333, rate: 25 },
+            { min: 32334, max: Infinity, rate: 30 }
+        ];
+        
+        const NHIF_RATES = [
+            { min: 0, max: 5999, amount: 150 },
+            { min: 6000, max: 7999, amount: 300 },
+            { min: 8000, max: 11999, amount: 400 },
+            { min: 12000, max: 14999, amount: 500 },
+            { min: 15000, max: 19999, amount: 600 },
+            { min: 20000, max: 24999, amount: 750 },
+            { min: 25000, max: 29999, amount: 850 },
+            { min: 30000, max: 34999, amount: 900 },
+            { min: 35000, max: 39999, amount: 950 },
+            { min: 40000, max: 44999, amount: 1000 },
+            { min: 45000, max: 49999, amount: 1100 },
+            { min: 50000, max: 59999, amount: 1200 },
+            { min: 60000, max: 69999, amount: 1300 },
+            { min: 70000, max: 79999, amount: 1400 },
+            { min: 80000, max: 89999, amount: 1500 },
+            { min: 90000, max: 99999, amount: 1600 },
+            { min: 100000, max: Infinity, amount: 1700 }
+        ];
+        
+        const NSSF_RATE = 0.06; // 6% of gross salary (Tier I & II combined)
+        
+        const initialEmployees = [
+            {
+                id: 'EMP001',
+                name: 'John Kimani',
+                position: 'Software Developer',
+                basicSalary: 80000,
+                allowances: 15000,
+                loanRepayment: 5000,
+                salaryAdvance: 0,
+                saccoContribution: 3000,
+                pensionContribution: 2000,
+                insurance: 1500,
+                bankDetails: 'KCB Bank - 1234567890'
+            },
+            {
+                id: 'EMP002',
+                name: 'Mary Wanjiku',
+                position: 'HR Manager',
+                basicSalary: 90000,
+                allowances: 20000,
+                loanRepayment: 8000,
+                salaryAdvance: 2000,
+                saccoContribution: 4000,
+                pensionContribution: 3000,
+                insurance: 2000,
+                bankDetails: 'Equity Bank - 0987654321'
+            },
+            {
+                id: 'EMP003',
+                name: 'David Ochieng',
+                position: 'Accountant',
+                basicSalary: 70000,
+                allowances: 12000,
+                loanRepayment: 6000,
+                salaryAdvance: 1000,
+                saccoContribution: 2500,
+                pensionContribution: 2000,
+                insurance: 1200,
+                bankDetails: 'M-Pesa - 0712345678'
+            }
+        ];
+        
+        function PayrollApp() {
+            const [currentPage, setCurrentPage] = useState('login');
+            const [isLoggedIn, setIsLoggedIn] = useState(false);
+            const [currentUser, setCurrentUser] = useState({ name: 'Admin User', email: 'admin@company.com' });
+            const [employees, setEmployees] = useState(initialEmployees);
+            const [selectedEmployee, setSelectedEmployee] = useState(null);
+            const [searchTerm, setSearchTerm] = useState('');
+            const [selectedMonth, setSelectedMonth] = useState('January');
+            const [payrollData, setPayrollData] = useState([]);
+            const [showModal, setShowModal] = useState(false);
+            const [modalType, setModalType] = useState('');
+            const [formData, setFormData] = useState({});
+            
+            // Calculate statutory deductions
+            const calculatePAYE = (grossSalary) => {
+                let taxableIncome = grossSalary - 2400; // Personal relief
+                let paye = 0;
                 
-                <!-- Quick Stats -->
-                <div class="row mb-4">
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card stats-card">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center">
-                                    <div class="icon-box stat-icon-blue me-3">
-                                        <i class="bi bi-people-fill"></i>
-                                    </div>
-                                    <div>
-                                        <h6 class="text-muted mb-1">Total Employees</h6>
-                                        <h4 class="mb-0" id="totalEmployees">24</h4>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card stats-card">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center">
-                                    <div class="icon-box stat-icon-green me-3">
-                                        <i class="bi bi-cash"></i>
-                                    </div>
-                                    <div>
-                                        <h6 class="text-muted mb-1">This Month Payroll</h6>
-                                        <h4 class="mb-0" id="payrollTotal">KES 1,240,500</h4>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card stats-card">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center">
-                                    <div class="icon-box stat-icon-yellow me-3">
-                                        <i class="bi bi-shield-check"></i>
-                                    </div>
-                                    <div>
-                                        <h6 class="text-muted mb-1">Total PAYE</h6>
-                                        <h4 class="mb-0" id="totalPAYE">KES 185,200</h4>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-md-6 mb-4">
-                        <div class="card stats-card">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center">
-                                    <div class="icon-box stat-icon-purple me-3">
-                                        <i class="bi bi-credit-card"></i>
-                                    </div>
-                                    <div>
-                                        <h6 class="text-muted mb-1">Total NHIF/NSSF</h6>
-                                        <h4 class="mb-0" id="totalNHIFNSSF">KES 42,600</h4>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Shortcuts -->
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Shortcuts</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <button class="btn btn-primary shortcut-btn" data-page="payroll">
-                                    <i class="bi bi-calculator"></i> Run Payroll
-                                </button>
-                            </div>
-                            <div class="col-md-4">
-                                <button class="btn btn-success shortcut-btn" data-page="employees" data-action="add">
-                                    <i class="bi bi-person-plus"></i> Add Employee
-                                </button>
-                            </div>
-                            <div class="col-md-4">
-                                <button class="btn btn-info shortcut-btn" data-page="reports">
-                                    <i class="bi bi-file-earmark-text"></i> Generate Reports
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Employees Page -->
-            <div id="employeesPage" class="page-content" style="display: none;">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h1 class="page-title">Employees</h1>
-                    <button class="btn btn-primary" id="addEmployeeBtn">
-                        <i class="bi bi-plus-circle"></i> Add New Employee
-                    </button>
-                </div>
-
-                <!-- Search Bar -->
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                    <input type="text" class="form-control" id="employeeSearch" placeholder="Search by name, ID, or position...">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Employees Table -->
-                <div class="card">
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>ID</th>
-                                        <th>Position</th>
-                                        <th>Basic Salary</th>
-                                        <th>Bank/M-Pesa</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="employeesTableBody">
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar-circle me-2">JD</div>
-                                                <div>John Doe</div>
-                                            </div>
-                                        </td>
-                                        <td>EMP001</td>
-                                        <td>Software Developer</td>
-                                        <td>KES 85,000</td>
-                                        <td>Bank</td>
-                                        <td class="table-actions">
-                                            <button class="btn btn-sm btn-outline-primary view-employee-btn"><i class="bi bi-eye"></i></button>
-                                            <button class="btn btn-sm btn-outline-secondary edit-employee-btn"><i class="bi bi-pencil"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger delete-employee-btn"><i class="bi bi-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar-circle me-2">AS</div>
-                                                <div>Anne Smith</div>
-                                            </div>
-                                        </td>
-                                        <td>EMP002</td>
-                                        <td>HR Manager</td>
-                                        <td>KES 75,000</td>
-                                        <td>Bank</td>
-                                        <td class="table-actions">
-                                            <button class="btn btn-sm btn-outline-primary view-employee-btn"><i class="bi bi-eye"></i></button>
-                                            <button class="btn btn-sm btn-outline-secondary edit-employee-btn"><i class="bi bi-pencil"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger delete-employee-btn"><i class="bi bi-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar-circle me-2">MJ</div>
-                                                <div>Michael Johnson</div>
-                                            </div>
-                                        </td>
-                                        <td>EMP003</td>
-                                        <td>Accountant</td>
-                                        <td>KES 65,000</td>
-                                        <td>M-Pesa</td>
-                                        <td class="table-actions">
-                                            <button class="btn btn-sm btn-outline-primary view-employee-btn"><i class="bi bi-eye"></i></button>
-                                            <button class="btn btn-sm btn-outline-secondary edit-employee-btn"><i class="bi bi-pencil"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger delete-employee-btn"><i class="bi bi-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Payroll Page -->
-            <div id="payrollPage" class="page-content" style="display: none;">
-                <h1 class="page-title">Payroll</h1>
+                for (const bracket of PAYE_BRACKETS) {
+                    if (taxableIncome <= 0) break;
+                    const taxableAmount = Math.min(taxableIncome, bracket.max - bracket.min + 1);
+                    paye += taxableAmount * (bracket.rate / 100);
+                    taxableIncome -= taxableAmount;
+                }
                 
-                <!-- Month Selector -->
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col-md-4">
-                                <label for="payrollMonth" class="form-label">Month</label>
-                                <select class="form-select" id="payrollMonth">
-                                    <option value="0">January</option>
-                                    <option value="1">February</option>
-                                    <option value="2">March</option>
-                                    <option value="3">April</option>
-                                    <option value="4">May</option>
-                                    <option value="5">June</option>
-                                    <option value="6">July</option>
-                                    <option value="7">August</option>
-                                    <option value="8">September</option>
-                                    <option value="9">October</option>
-                                    <option value="10">November</option>
-                                    <option value="11" selected>December</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="payrollYear" class="form-label">Year</label>
-                                <select class="form-select" id="payrollYear">
-                                    <option value="2023" selected>2023</option>
-                                    <option value="2022">2022</option>
-                                    <option value="2021">2021</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4 d-flex align-items-end">
-                                <button class="btn btn-primary w-100" id="generatePayrollBtn">
-                                    <i class="bi bi-calculator"></i> Generate Payroll
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Payroll Table -->
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Payroll Summary</h5>
-                        <div>
-                            <button class="btn btn-sm btn-outline-success me-2" id="exportExcelBtn">
-                                <i class="bi bi-file-earmark-excel"></i> Export to Excel
-                            </button>
-                            <button class="btn btn-sm btn-outline-primary" id="sendPayslipsBtn">
-                                <i class="bi bi-envelope"></i> Send Payslips
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Employee</th>
-                                        <th>Basic</th>
-                                        <th>Overtime</th>
-                                        <th>Allowances</th>
-                                        <th>Loan</th>
-                                        <th>Sacco</th>
-                                        <th>Pension</th>
-                                        <th>Insurance</th>
-                                        <th>PAYE</th>
-                                        <th>NHIF</th>
-                                        <th>NSSF</th>
-                                        <th>Net Pay</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="payrollTableBody">
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar-circle me-2">JD</div>
-                                                <div>John Doe</div>
-                                            </div>
-                                        </td>
-                                        <td>KES 85,000</td>
-                                        <td>KES 5,000</td>
-                                        <td>KES 10,000</td>
-                                        <td>KES 5,000</td>
-                                        <td>KES 3,000</td>
-                                        <td>KES 5,000</td>
-                                        <td>KES 2,000</td>
-                                        <td>KES 18,750</td>
-                                        <td>KES 1,700</td>
-                                        <td>KES 2,000</td>
-                                        <td>KES 62,550</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-primary payslip-btn"><i class="bi bi-file-earmark-pdf"></i> Payslip</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar-circle me-2">AS</div>
-                                                <div>Anne Smith</div>
-                                            </div>
-                                        </td>
-                                        <td>KES 75,000</td>
-                                        <td>KES 0</td>
-                                        <td>KES 8,000</td>
-                                        <td>KES 0</td>
-                                        <td>KES 2,500</td>
-                                        <td>KES 4,000</td>
-                                        <td>KES 1,500</td>
-                                        <td>KES 15,750</td>
-                                        <td>KES 1,500</td>
-                                        <td>KES 1,800</td>
-                                        <td>KES 56,450</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-primary payslip-btn"><i class="bi bi-file-earmark-pdf"></i> Payslip</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar-circle me-2">MJ</div>
-                                                <div>Michael Johnson</div>
-                                            </div>
-                                        </td>
-                                        <td>KES 65,000</td>
-                                        <td>KES 3,000</td>
-                                        <td>KES 7,000</td>
-                                        <td>KES 2,000</td>
-                                        <td>KES 2,000</td>
-                                        <td>KES 3,500</td>
-                                        <td>KES 1,000</td>
-                                        <td>KES 13,125</td>
-                                        <td>KES 1,350</td>
-                                        <td>KES 1,560</td>
-                                        <td>KES 52,465</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-primary payslip-btn"><i class="bi bi-file-earmark-pdf"></i> Payslip</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Reports Page -->
-            <div id="reportsPage" class="page-content" style="display: none;">
-                <h1 class="page-title">Reports</h1>
-                
-                <!-- Filters -->
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label for="reportMonth" class="form-label">Month</label>
-                                <select class="form-select" id="reportMonth">
-                                    <option value="0">January</option>
-                                    <option value="1">February</option>
-                                    <option value="2">March</option>
-                                    <option value="3">April</option>
-                                    <option value="4">May</option>
-                                    <option value="5">June</option>
-                                    <option value="6">July</option>
-                                    <option value="7">August</option>
-                                    <option value="8">September</option>
-                                    <option value="9">October</option>
-                                    <option value="10">November</option>
-                                    <option value="11" selected>December</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="reportYear" class="form-label">Year</label>
-                                <select class="form-select" id="reportYear">
-                                    <option value="2023" selected>2023</option>
-                                    <option value="2022">2022</option>
-                                    <option value="2021">2021</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="reportDepartment" class="form-label">Department</label>
-                                <select class="form-select" id="reportDepartment">
-                                    <option value="All" selected>All Departments</option>
-                                    <option value="IT">IT</option>
-                                    <option value="HR">HR</option>
-                                    <option value="Finance">Finance</option>
-                                    <option value="Operations">Operations</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Charts -->
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">Payroll Breakdown</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="chart-container">
-                                    <canvas id="payrollBreakdownChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">Department Salary Distribution</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="chart-container">
-                                    <canvas id="departmentDistributionChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Download Buttons -->
-                <div class="card">
-                    <div class="card-body d-flex justify-content-end">
-                        <button class="btn btn-outline-danger me-2" id="downloadPdfBtn">
-                            <i class="bi bi-file-earmark-pdf"></i> Download PDF
-                        </button>
-                        <button class="btn btn-outline-success" id="downloadExcelBtn">
-                            <i class="bi bi-file-earmark-excel"></i> Download Excel
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Settings Page -->
-            <div id="settingsPage" class="page-content" style="display: none;">
-                <h1 class="page-title">Settings</h1>
-                
-                <!-- Company Info -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Company Information</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="companyName" class="form-label">Company Name</label>
-                                    <input type="text" class="form-control" id="companyName" value="Kenya Payroll System">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="overtimeRate" class="form-label">Overtime Rate</label>
-                                    <input type="number" class="form-control" id="overtimeRate" value="1.5" step="0.1">
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="mb-3">
-                                    <label for="companyAddress" class="form-label">Company Address</label>
-                                    <textarea class="form-control" id="companyAddress" rows="2">Nairobi, Kenya</textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Payroll Rules -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Payroll Rules</h5>
-                    </div>
-                    <div class="card-body">
-                        <!-- PAYE Tax Brackets -->
-                        <h6 class="mb-3">PAYE Tax Brackets</h6>
-                        <div class="table-responsive mb-4">
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Min Amount (KES)</th>
-                                        <th>Max Amount (KES)</th>
-                                        <th>Rate (%)</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td><input type="number" class="form-control form-control-sm" value="0"></td>
-                                        <td><input type="number" class="form-control form-control-sm" value="24000"></td>
-                                        <td><input type="number" class="form-control form-control-sm" value="10" step="0.1"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><input type="number" class="form-control form-control-sm" value="24001"></td>
-                                        <td><input type="number" class="form-control form-control-sm" value="32333"></td>
-                                        <td><input type="number" class="form-control form-control-sm" value="25" step="0.1"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><input type="number" class="form-control form-control-sm" value="32334"></td>
-                                        <td><input type="number" class="form-control form-control-sm" value="500000"></td>
-                                        <td><input type="number" class="form-control form-control-sm" value="30" step="0.1"></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- NHIF Rates -->
-                        <h6 class="mb-3">NHIF Deduction Rates</h6>
-                        <div class="table-responsive mb-4">
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Min Salary (KES)</th>
-                                        <th>Max Salary (KES)</th>
-                                        <th>Employee Contribution (KES)</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td><input type="number" class="form-control form-control-sm" value="0"></td>
-                                        <td><input type="number" class="form-control form-control-sm" value="5999"></td>
-                                        <td><input type="number" class="form-control form-control-sm" value="150"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><input type="number" class="form-control form-control-sm" value="6000"></td>
-                                        <td><input type="number" class="form-control form-control-sm" value="7999"></td>
-                                        <td><input type="number" class="form-control form-control-sm" value="300"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><input type="number" class="form-control form-control-sm" value="8000"></td>
-                                        <td><input type="number" class="form-control form-control-sm" value="11999"></td>
-                                        <td><input type="number" class="form-control form-control-sm" value="400"></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- NSSF Rates -->
-                        <h6 class="mb-3">NSSF Rates</h6>
-                        <div class="table-responsive mb-4">
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Tier</th>
-                                        <th>Min Amount (KES)</th>
-                                        <th>Max Amount (KES)</th>
-                                        <th>Employee Rate (%)</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td><input type="number" class="form-control form-control-sm" value="1"></td>
-                                        <td><input type="number" class="form-control form-control-sm" value="0"></td>
-                                        <td><input type="number" class="form-control form-control-sm" value="7000"></td>
-                                        <td><input type="number" class="form-control form-control-sm" value="6" step="0.1"></td>
-                                    </tr>
-                                    <tr>
-                                        <td><input type="number" class="form-control form-control-sm" value="2"></td>
-                                        <td><input type="number" class="form-control form-control-sm" value="7001"></td>
-                                        <td><input type="number" class="form-control form-control-sm" value="36000"></td>
-                                        <td><input type="number" class="form-control form-control-sm" value="6" step="0.1"></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Pension Rate -->
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="pensionRate" class="form-label">Pension Rate (%)</label>
-                                    <input type="number" class="form-control" id="pensionRate" value="0" step="0.1">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Users & Roles -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Users & Roles</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive mb-3">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Role</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>System Admin</td>
-                                        <td>admin@kenyapayroll.com</td>
-                                        <td><span class="badge bg-primary">Admin</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary me-1">Edit</button>
-                                            <button class="btn btn-sm btn-outline-danger">Delete</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>HR Manager</td>
-                                        <td>hr@kenyapayroll.com</td>
-                                        <td><span class="badge bg-success">HR</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary me-1">Edit</button>
-                                            <button class="btn btn-sm btn-outline-danger">Delete</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            <button class="btn btn-success me-2" id="addHRManagerBtn">
-                                <i class="bi bi-person-plus"></i> Add HR Manager
-                            </button>
-                            <button class="btn btn-primary" id="addAdminBtn">
-                                <i class="bi bi-person-plus"></i> Add Admin
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Save/Cancel Buttons -->
-                <div class="d-flex justify-content-end">
-                    <button class="btn btn-outline-secondary me-2" id="cancelSettingsBtn">Cancel</button>
-                    <button class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Employee Modal -->
-    <div class="modal fade" id="employeeModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="employeeModalTitle">Add Employee</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="employeeForm">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="employeeName" class="form-label">Name</label>
-                                    <input type="text" class="form-control" id="employeeName" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="employeeID" class="form-label">Employee ID</label>
-                                    <input type="text" class="form-control" id="employeeID" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="employeePosition" class="form-label">Position</label>
-                                    <input type="text" class="form-control" id="employeePosition" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="basicSalary" class="form-label">Basic Salary (KES)</label>
-                                    <input type="number" class="form-control" id="basicSalary" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="allowances" class="form-label">Allowances (KES)</label>
-                                    <input type="number" class="form-control" id="allowances" value="0">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="bankDetails" class="form-label">Bank Details</label>
-                                    <input type="text" class="form-control" id="bankDetails">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="mpesaDetails" class="form-label">M-Pesa Details</label>
-                                    <input type="text" class="form-control" id="mpesaDetails">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <h6 class="mt-4 mb-3">Deductions</h6>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="loanRepayment" class="form-label">Loan Repayment (KES)</label>
-                                    <input type="number" class="form-control" id="loanRepayment" value="0">
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="salaryAdvance" class="form-label">Salary Advance (KES)</label>
-                                    <input type="number" class="form-control" id="salaryAdvance" value="0">
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="saccoContribution" class="form-label">Sacco Contribution (KES)</label>
-                                    <input type="number" class="form-control" id="saccoContribution" value="0">
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="pensionContribution" class="form-label">Pension Contribution (KES)</label>
-                                    <input type="number" class="form-control" id="pensionContribution" value="0">
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="insuranceWelfare" class="form-label">Insurance/Welfare (KES)</label>
-                                    <input type="number" class="form-control" id="insuranceWelfare" value="0">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <h6 class="mt-4 mb-3">Statutory Deductions</h6>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="paye" class="form-label">PAYE (KES)</label>
-                                    <input type="text" class="form-control" id="paye" readonly>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="nhif" class="form-label">NHIF (KES)</label>
-                                    <input type="text" class="form-control" id="nhif" readonly>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="nssf" class="form-label">NSSF (KES)</label>
-                                    <input type="text" class="form-control" id="nssf" readonly>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="saveEmployeeBtn">Save</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // DOM Elements
-        const loginPage = document.getElementById('loginPage');
-        const mainApp = document.getElementById('mainApp');
-        const loginForm = document.getElementById('loginForm');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const sidebar = document.getElementById('sidebar');
-        const menuToggle = document.getElementById('menuToggle');
-        const navLinks = document.querySelectorAll('.nav-link');
-        const pageContents = document.querySelectorAll('.page-content');
-        const employeeModal = new bootstrap.Modal(document.getElementById('employeeModal'));
-        const employeeModalTitle = document.getElementById('employeeModalTitle');
-        const employeeForm = document.getElementById('employeeForm');
-        const saveEmployeeBtn = document.getElementById('saveEmployeeBtn');
-        const basicSalaryInput = document.getElementById('basicSalary');
-        const payeInput = document.getElementById('paye');
-        const nhifInput = document.getElementById('nhif');
-        const nssfInput = document.getElementById('nssf');
-        const addEmployeeBtn = document.getElementById('addEmployeeBtn');
-        const generatePayrollBtn = document.getElementById('generatePayrollBtn');
-        const payslipBtns = document.querySelectorAll('.payslip-btn');
-        const exportExcelBtns = document.querySelectorAll('#exportExcelBtn, #downloadExcelBtn');
-        const sendPayslipsBtn = document.getElementById('sendPayslipsBtn');
-        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
-        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
-        const cancelSettingsBtn = document.getElementById('cancelSettingsBtn');
-        const addHRManagerBtn = document.getElementById('addHRManagerBtn');
-        const addAdminBtn = document.getElementById('addAdminBtn');
-        const employeeSearch = document.getElementById('employeeSearch');
-        const employeesTableBody = document.getElementById('employeesTableBody');
-        const viewEmployeeBtns = document.querySelectorAll('.view-employee-btn');
-        const editEmployeeBtns = document.querySelectorAll('.edit-employee-btn');
-        const deleteEmployeeBtns = document.querySelectorAll('.delete-employee-btn');
-        const shortcutBtns = document.querySelectorAll('.shortcut-btn');
-
-        // Initialize app
-        document.addEventListener('DOMContentLoaded', function() {
-            // Setup event listeners
-            loginForm.addEventListener('submit', handleLogin);
-            logoutBtn.addEventListener('click', handleLogout);
-            menuToggle.addEventListener('click', toggleSidebar);
-            navLinks.forEach(link => {
-                link.addEventListener('click', navigateToPage);
-            });
-            addEmployeeBtn.addEventListener('click', () => openEmployeeModal('add'));
-            saveEmployeeBtn.addEventListener('click', saveEmployee);
-            basicSalaryInput.addEventListener('input', calculateStatutoryDeductions);
-            generatePayrollBtn.addEventListener('click', generatePayroll);
-            payslipBtns.forEach(btn => {
-                btn.addEventListener('click', generatePayslip);
-            });
-            exportExcelBtns.forEach(btn => {
-                btn.addEventListener('click', exportToExcel);
-            });
-            sendPayslipsBtn.addEventListener('click', sendPayslips);
-            downloadPdfBtn.addEventListener('click', downloadPdf);
-            saveSettingsBtn.addEventListener('click', saveSettings);
-            cancelSettingsBtn.addEventListener('click', () => navigateToPage('dashboard'));
-            addHRManagerBtn.addEventListener('click', () => alert('Add HR Manager functionality would be implemented here'));
-            addAdminBtn.addEventListener('click', () => alert('Add Admin functionality would be implemented here'));
-            employeeSearch.addEventListener('input', filterEmployees);
-            viewEmployeeBtns.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const row = e.target.closest('tr');
-                    const employeeName = row.cells[0].textContent.trim();
-                    openEmployeeModal('view', employeeName);
-                });
-            });
-            editEmployeeBtns.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const row = e.target.closest('tr');
-                    const employeeName = row.cells[0].textContent.trim();
-                    openEmployeeModal('edit', employeeName);
-                });
-            });
-            deleteEmployeeBtns.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    if (confirm('Are you sure you want to delete this employee?')) {
-                        const row = e.target.closest('tr');
-                        row.remove();
-                        alert('Employee deleted successfully');
-                    }
-                });
-            });
-            shortcutBtns.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const page = e.currentTarget.dataset.page;
-                    const action = e.currentTarget.dataset.action;
+                return Math.max(0, paye - 2400); // Subtract personal relief
+            };
+            
+            const calculateNHIF = (grossSalary) => {
+                const rate = NHIF_RATES.find(r => grossSalary >= r.min && grossSalary <= r.max);
+                return rate ? rate.amount : 1700;
+            };
+            
+            const calculateNSSF = (grossSalary) => {
+                return Math.min(grossSalary * NSSF_RATE, 2160); // Max NSSF contribution
+            };
+            
+            // Generate payroll for selected month
+            const generatePayroll = () => {
+                const payroll = employees.map(emp => {
+                    const grossSalary = emp.basicSalary + emp.allowances;
+                    const paye = calculatePAYE(grossSalary);
+                    const nhif = calculateNHIF(grossSalary);
+                    const nssf = calculateNSSF(grossSalary);
                     
-                    if (page) {
-                        navigateToPage({ currentTarget: { dataset: { page } } });
+                    const totalDeductions = emp.loanRepayment + emp.salaryAdvance + emp.saccoContribution + 
+                                           emp.pensionContribution + emp.insurance + paye + nhif + nssf;
+                    
+                    const netPay = grossSalary - totalDeductions;
+                    return {
+                        ...emp,
+                        grossSalary,
+                        paye,
+                        nhif,
+                        nssf,
+                        totalDeductions,
+                        netPay
+                    };
+                });
+                
+                setPayrollData(payroll);
+            };
+            
+            // Filter employees based on search
+            const filteredEmployees = employees.filter(emp => 
+                emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                emp.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                emp.position.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            
+            // Calculate dashboard stats
+            const totalEmployees = employees.length;
+            const monthlyPayrollTotal = payrollData.reduce((sum, emp) => sum + emp.netPay, 0);
+            const totalPAYE = payrollData.reduce((sum, emp) => sum + emp.paye, 0);
+            const totalNHIFNSSF = payrollData.reduce((sum, emp) => sum + emp.nhif + emp.nssf, 0);
+            const totalLoans = payrollData.reduce((sum, emp) => sum + emp.loanRepayment, 0);
+            
+            // Login Page Component
+            const LoginPage = () => (
+                <div className="min-h-screen bg-gradient-to-br from-blue-900 to-blue-600 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-md">
+                        <div className="text-center mb-8">
+                            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Icon name="building" className="w-8 h-8 text-white" />
+                            </div>
+                            <h1 className="text-2xl font-bold text-gray-900">Payroll System</h1>
+                            <p className="text-gray-600">Kenya Payroll Management</p>
+                        </div>
                         
-                        if (action === 'add' && page === 'employees') {
-                            setTimeout(() => {
-                                openEmployeeModal('add');
-                            }, 300);
-                        }
-                    }
-                });
-            });
-
-            // Initialize charts if reports page is visible
-            if (document.getElementById('reportsPage').style.display !== 'none') {
-                initializeCharts();
-            }
-        });
-
-        // Handle login
-        function handleLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const rememberMe = document.getElementById('rememberMe').checked;
+                        <form onSubmit={(e) => {
+                            e.preventDefault();
+                            setIsLoggedIn(true);
+                            setCurrentPage('dashboard');
+                        }}>
+                            <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                <input
+                                    type="email"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Enter your email"
+                                    required
+                                />
+                            </div>
+                            
+                            <div className="mb-6">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                                <input
+                                    type="password"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Enter your password"
+                                    required
+                                />
+                            </div>
+                            
+                            <div className="mb-6 flex items-center">
+                                <input type="checkbox" id="remember" className="mr-2" />
+                                <label htmlFor="remember" className="text-sm text-gray-600">Remember me</label>
+                            </div>
+                            
+                            <button
+                                type="submit"
+                                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200"
+                            >
+                                Login
+                            </button>
+                            
+                            <div className="text-center mt-4">
+                                <a href="#" className="text-blue-600 text-sm hover:underline">
+                                    Forgot Password?
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
             
-            // Simple validation (in a real app, this would be an API call)
-            if (email && password) {
-                loginPage.style.display = 'none';
-                mainApp.style.display = 'block';
+            // Navigation Component
+            const Navigation = () => (
+                <nav className="bg-blue-800 text-white p-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-6">
+                            <div className="flex items-center">
+                                <Icon name="building" className="w-8 h-8 mr-2" />
+                                <span className="text-xl font-bold">PayrollKE</span>
+                            </div>
+                            
+                            <div className="hidden md:flex space-x-4">
+                                <button
+                                    onClick={() => setCurrentPage('dashboard')}
+                                    className={`flex items-center px-3 py-2 rounded ${currentPage === 'dashboard' ? 'bg-blue-700' : 'hover:bg-blue-700'}`}
+                                >
+                                    <Icon name="home" className="w-4 h-4 mr-1" />
+                                    Dashboard
+                                </button>
+                                <button
+                                    onClick={() => setCurrentPage('employees')}
+                                    className={`flex items-center px-3 py-2 rounded ${currentPage === 'employees' ? 'bg-blue-700' : 'hover:bg-blue-700'}`}
+                                >
+                                    <Icon name="users" className="w-4 h-4 mr-1" />
+                                    Employees
+                                </button>
+                                <button
+                                    onClick={() => setCurrentPage('payroll')}
+                                    className={`flex items-center px-3 py-2 rounded ${currentPage === 'payroll' ? 'bg-blue-700' : 'hover:bg-blue-700'}`}
+                                >
+                                    <Icon name="dollar" className="w-4 h-4 mr-1" />
+                                    Payroll
+                                </button>
+                                <button
+                                    onClick={() => setCurrentPage('reports')}
+                                    className={`flex items-center px-3 py-2 rounded ${currentPage === 'reports' ? 'bg-blue-700' : 'hover:bg-blue-700'}`}
+                                >
+                                    <Icon name="file" className="w-4 h-4 mr-1" />
+                                    Reports
+                                </button>
+                                <button
+                                    onClick={() => setCurrentPage('settings')}
+                                    className={`flex items-center px-3 py-2 rounded ${currentPage === 'settings' ? 'bg-blue-700' : 'hover:bg-blue-700'}`}
+                                >
+                                    <Icon name="settings" className="w-4 h-4 mr-1" />
+                                    Settings
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <button
+                            onClick={() => {
+                                setIsLoggedIn(false);
+                                setCurrentPage('login');
+                            }}
+                            className="flex items-center px-3 py-2 rounded hover:bg-blue-700"
+                        >
+                            <Icon name="logout" className="w-4 h-4 mr-1" />
+                            Logout
+                        </button>
+                    </div>
+                </nav>
+            );
+            
+            // Dashboard Page Component
+            const DashboardPage = () => (
+                <div className="p-6">
+                    <h1 className="text-3xl font-bold text-gray-900 mb-6">Welcome, {currentUser.name}</h1>
+                    
+                    {/* Quick Stats */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+                        <div className="bg-white p-6 rounded-lg shadow">
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Total Employees</h3>
+                            <p className="text-3xl font-bold text-blue-600">{totalEmployees}</p>
+                        </div>
+                        <div className="bg-white p-6 rounded-lg shadow">
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Monthly Payroll</h3>
+                            <p className="text-3xl font-bold text-green-600">KSh {monthlyPayrollTotal.toLocaleString()}</p>
+                        </div>
+                        <div className="bg-white p-6 rounded-lg shadow">
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Total PAYE</h3>
+                            <p className="text-3xl font-bold text-orange-600">KSh {totalPAYE.toLocaleString()}</p>
+                        </div>
+                        <div className="bg-white p-6 rounded-lg shadow">
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">NHIF/NSSF</h3>
+                            <p className="text-3xl font-bold text-purple-600">KSh {totalNHIFNSSF.toLocaleString()}</p>
+                        </div>
+                        <div className="bg-white p-6 rounded-lg shadow">
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Loan Deductions</h3>
+                            <p className="text-3xl font-bold text-red-600">KSh {totalLoans.toLocaleString()}</p>
+                        </div>
+                    </div>
+                    
+                    {/* Shortcuts */}
+                    <div className="bg-white p-6 rounded-lg shadow">
+                        <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <button
+                                onClick={() => setCurrentPage('payroll')}
+                                className="bg-blue-600 text-white p-4 rounded-lg hover:bg-blue-700 transition duration-200"
+                            >
+                                <Icon name="dollar" className="w-6 h-6 mb-2" />
+                                Run Payroll
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setModalType('add');
+                                    setFormData({});
+                                    setShowModal(true);
+                                }}
+                                className="bg-green-600 text-white p-4 rounded-lg hover:bg-green-700 transition duration-200"
+                            >
+                                <Icon name="plus" className="w-6 h-6 mb-2" />
+                                Add Employee
+                            </button>
+                            <button
+                                onClick={() => setCurrentPage('reports')}
+                                className="bg-purple-600 text-white p-4 rounded-lg hover:bg-purple-700 transition duration-200"
+                            >
+                                <Icon name="file" className="w-6 h-6 mb-2" />
+                                Generate Reports
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+            
+            // Employees Page Component
+            const EmployeesPage = () => (
+                <div className="p-6">
+                    <div className="flex justify-between items-center mb-6">
+                        <h1 className="text-3xl font-bold text-gray-900">Employees</h1>
+                        <button
+                            onClick={() => {
+                                setModalType('add');
+                                setFormData({});
+                                setShowModal(true);
+                            }}
+                            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center"
+                        >
+                            <Icon name="plus" className="w-4 h-4 mr-2" />
+                            Add New Employee
+                        </button>
+                    </div>
+                    
+                    {/* Search */}
+                    <div className="mb-6">
+                        <div className="relative">
+                            <Icon name="search" className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Search by name, ID, or position..."
+                                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    
+                    {/* Employee Table */}
+                    <div className="bg-white rounded-lg shadow overflow-x-auto">
+                        <table className="w-full">
+                            <thead className="bg-gray-50">
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Basic Salary</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bank/M-Pesa</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="bg-white divide-y divide-gray-200">
+                                {filteredEmployees.map((employee) => (
+                                    <tr key={employee.id}>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{employee.name}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{employee.id}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{employee.position}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">KSh {employee.basicSalary.toLocaleString()}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{employee.bankDetails}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedEmployee(employee);
+                                                    setModalType('view');
+                                                    setShowModal(true);
+                                                }}
+                                                className="text-blue-600 hover:text-blue-900"
+                                            >
+                                                <Icon name="eye" className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setFormData(employee);
+                                                    setModalType('edit');
+                                                    setShowModal(true);
+                                                }}
+                                                className="text-green-600 hover:text-green-900"
+                                            >
+                                                <Icon name="edit" className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    if (confirm('Are you sure you want to delete this employee?')) {
+                                                        setEmployees(employees.filter(emp => emp.id !== employee.id));
+                                                    }
+                                                }}
+                                                className="text-red-600 hover:text-red-900"
+                                            >
+                                                <Icon name="trash" className="w-4 h-4" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            );
+            
+            // Payroll Page Component
+            const PayrollPage = () => (
+                <div className="p-6">
+                    <h1 className="text-3xl font-bold text-gray-900 mb-6">Payroll Management</h1>
+                    
+                    {/* Controls */}
+                    <div className="bg-white p-6 rounded-lg shadow mb-6">
+                        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Select Month</label>
+                                <select
+                                    value={selectedMonth}
+                                    onChange={(e) => setSelectedMonth(e.target.value)}
+                                    className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                                    {['January', 'February', 'March', 'April', 'May', 'June', 
+                                      'July', 'August', 'September', 'October', 'November', 'December'].map(month => (
+                                        <option key={month} value={month}>{month}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={generatePayroll}
+                                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                                >
+                                    Generate Payroll
+                                </button>
+                                <button
+                                    onClick={() => alert('Exporting to Excel...')}
+                                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center"
+                                >
+                                    <Icon name="download" className="w-4 h-4 mr-2" />
+                                    Export to Excel
+                                </button>
+                                <button
+                                    onClick={() => alert('Sending payslips...')}
+                                    className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 flex items-center"
+                                >
+                                    <Icon name="mail" className="w-4 h-4 mr-2" />
+                                    Send Payslips
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Payroll Table */}
+                    {payrollData.length > 0 && (
+                        <div className="bg-white rounded-lg shadow overflow-x-auto">
+                            <table className="w-full text-sm">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Employee</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Basic</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Allowances</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Loan</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sacco</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pension</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Insurance</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">PAYE</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">NHIF</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">NSSF</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Net Pay</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Payslip</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {payrollData.map((employee) => (
+                                        <tr key={employee.id}>
+                                            <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{employee.name}</td>
+                                            <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{employee.basicSalary.toLocaleString()}</td>
+                                            <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{employee.allowances.toLocaleString()}</td>
+                                            <td className="px-4 py-4 whitespace-nowrap text-sm text-red-600">{employee.loanRepayment.toLocaleString()}</td>
+                                            <td className="px-4 py-4 whitespace-nowrap text-sm text-red-600">{employee.saccoContribution.toLocaleString()}</td>
+                                            <td className="px-4 py-4 whitespace-nowrap text-sm text-red-600">{employee.pensionContribution.toLocaleString()}</td>
+                                            <td className="px-4 py-4 whitespace-nowrap text-sm text-red-600">{employee.insurance.toLocaleString()}</td>
+                                            <td className="px-4 py-4 whitespace-nowrap text-sm text-red-600">{employee.paye.toLocaleString()}</td>
+                                            <td className="px-4 py-4 whitespace-nowrap text-sm text-red-600">{employee.nhif.toLocaleString()}</td>
+                                            <td className="px-4 py-4 whitespace-nowrap text-sm text-red-600">{employee.nssf.toLocaleString()}</td>
+                                            <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-green-600">KSh {employee.netPay.toLocaleString()}</td>
+                                            <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                                                <button
+                                                    onClick={() => alert(`Generating payslip for ${employee.name}...`)}
+                                                    className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700"
+                                                >
+                                                    Payslip
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+            );
+            
+            // Reports Page Component
+            const ReportsPage = () => (
+                <div className="p-6">
+                    <h1 className="text-3xl font-bold text-gray-900 mb-6">Reports</h1>
+                    
+                    {/* Filters */}
+                    <div className="bg-white p-6 rounded-lg shadow mb-6">
+                        <h2 className="text-xl font-bold text-gray-900 mb-4">Filters</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Month</label>
+                                <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    {['January', 'February', 'March', 'April', 'May', 'June', 
+                                      'July', 'August', 'September', 'October', 'November', 'December'].map(month => (
+                                        <option key={month} value={month}>{month}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Department</label>
+                                <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option>All Departments</option>
+                                    <option>IT</option>
+                                    <option>HR</option>
+                                    <option>Finance</option>
+                                    <option>Marketing</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Charts */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div className="bg-white p-6 rounded-lg shadow">
+                            <h3 className="text-lg font-bold text-gray-900 mb-4">Payroll Breakdown</h3>
+                            <div className="h-64 bg-gray-100 rounded flex items-center justify-center">
+                                <p className="text-gray-500">Chart: Salaries vs Taxes vs Deductions</p>
+                            </div>
+                        </div>
+                        <div className="bg-white p-6 rounded-lg shadow">
+                            <h3 className="text-lg font-bold text-gray-900 mb-4">Department Salary Distribution</h3>
+                            <div className="h-64 bg-gray-100 rounded flex items-center justify-center">
+                                <p className="text-gray-500">Chart: Department Salary Distribution</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {/* Download Buttons */}
+                    <div className="bg-white p-6 rounded-lg shadow">
+                        <h2 className="text-xl font-bold text-gray-900 mb-4">Export Reports</h2>
+                        <div className="flex gap-4">
+                            <button
+                                onClick={() => alert('Downloading PDF report...')}
+                                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center"
+                            >
+                                <Icon name="download" className="w-4 h-4 mr-2" />
+                                Download PDF
+                            </button>
+                            <button
+                                onClick={() => alert('Downloading Excel report...')}
+                                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center"
+                            >
+                                <Icon name="download" className="w-4 h-4 mr-2" />
+                                Download Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+            
+            // Settings Page Component
+            const SettingsPage = () => {
+                const [companyInfo, setCompanyInfo] = useState({
+                    name: 'ABC Company Ltd',
+                    address: 'Nairobi, Kenya',
+                    logo: null
+                });
                 
-                // Set user name
-                document.getElementById('userName').textContent = 'Admin';
+                return (
+                    <div className="p-6">
+                        <h1 className="text-3xl font-bold text-gray-900 mb-6">Settings</h1>
+                        
+                        {/* Company Info */}
+                        <div className="bg-white p-6 rounded-lg shadow mb-6">
+                            <h2 className="text-xl font-bold text-gray-900 mb-4">Company Information</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
+                                    <input
+                                        type="text"
+                                        value={companyInfo.name}
+                                        onChange={(e) => setCompanyInfo({...companyInfo, name: e.target.value})}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                                    <input
+                                        type="text"
+                                        value={companyInfo.address}
+                                        onChange={(e) => setCompanyInfo({...companyInfo, address: e.target.value})}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                </div>
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Company Logo</label>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => setCompanyInfo({...companyInfo, logo: e.target.files[0]})}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* Payroll Rules */}
+                        <div className="bg-white p-6 rounded-lg shadow mb-6">
+                            <h2 className="text-xl font-bold text-gray-900 mb-4">Payroll Rules</h2>
+                            
+                            {/* PAYE Tax Brackets */}
+                            <div className="mb-6">
+                                <h3 className="text-lg font-medium text-gray-900 mb-3">PAYE Tax Brackets</h3>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full border border-gray-300">
+                                        <thead className="bg-gray-50">
+                                            <tr>
+                                                <th className="px-4 py-2 border border-gray-300 text-left">Min Amount (KSh)</th>
+                                                <th className="px-4 py-2 border border-gray-300 text-left">Max Amount (KSh)</th>
+                                                <th className="px-4 py-2 border border-gray-300 text-left">Tax Rate (%)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {PAYE_BRACKETS.map((bracket, index) => (
+                                                <tr key={index}>
+                                                    <td className="px-4 py-2 border border-gray-300">
+                                                        <input
+                                                            type="number"
+                                                            value={bracket.min}
+                                                            className="w-full px-2 py-1 border border-gray-200 rounded"
+                                                            readOnly
+                                                        />
+                                                    </td>
+                                                    <td className="px-4 py-2 border border-gray-300">
+                                                        <input
+                                                            type="text"
+                                                            value={bracket.max === Infinity ? 'Above' : bracket.max}
+                                                            className="w-full px-2 py-1 border border-gray-200 rounded"
+                                                            readOnly
+                                                        />
+                                                    </td>
+                                                    <td className="px-4 py-2 border border-gray-300">
+                                                        <input
+                                                            type="number"
+                                                            value={bracket.rate}
+                                                            className="w-full px-2 py-1 border border-gray-200 rounded"
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            {/* Other Rates */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">NSSF Rate (%)</label>
+                                    <input
+                                        type="number"
+                                        value={NSSF_RATE * 100}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Pension Rate (%)</label>
+                                    <input
+                                        type="number"
+                                        defaultValue="5"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Overtime Rate (multiplier)</label>
+                                    <input
+                                        type="number"
+                                        defaultValue="1.5"
+                                        step="0.1"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* Users & Roles */}
+                        <div className="bg-white p-6 rounded-lg shadow mb-6">
+                            <h2 className="text-xl font-bold text-gray-900 mb-4">Users & Roles</h2>
+                            
+                            <div className="mb-4">
+                                <h3 className="text-lg font-medium text-gray-900 mb-3">Current Users</h3>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full">
+                                        <thead className="bg-gray-50">
+                                            <tr>
+                                                <th className="px-4 py-2 text-left">Name</th>
+                                                <th className="px-4 py-2 text-left">Email</th>
+                                                <th className="px-4 py-2 text-left">Role</th>
+                                                <th className="px-4 py-2 text-left">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-200">
+                                            <tr>
+                                                <td className="px-4 py-2">Admin User</td>
+                                                <td className="px-4 py-2">admin@company.com</td>
+                                                <td className="px-4 py-2">Admin</td>
+                                                <td className="px-4 py-2">
+                                                    <button className="text-red-600 hover:text-red-900">Remove</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td className="px-4 py-2">HR Manager</td>
+                                                <td className="px-4 py-2">hr@company.com</td>
+                                                <td className="px-4 py-2">HR</td>
+                                                <td className="px-4 py-2">
+                                                    <button className="text-red-600 hover:text-red-900">Remove</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <div className="flex gap-4">
+                                <button
+                                    onClick={() => alert('Adding HR Manager...')}
+                                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                                >
+                                    Add HR Manager
+                                </button>
+                                <button
+                                    onClick={() => alert('Adding Admin...')}
+                                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                                >
+                                    Add Admin
+                                </button>
+                            </div>
+                        </div>
+                        
+                        {/* Save/Cancel Buttons */}
+                        <div className="flex gap-4">
+                            <button
+                                onClick={() => alert('Settings saved successfully!')}
+                                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+                            >
+                                Save Settings
+                            </button>
+                            <button
+                                onClick={() => setCurrentPage('dashboard')}
+                                className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                );
+            };
+            
+            // Employee Form Modal Component
+            const EmployeeFormModal = () => {
+                const [localFormData, setLocalFormData] = useState(formData);
                 
-                // Store login state if remember me is checked
-                if (rememberMe) {
-                    localStorage.setItem('isLoggedIn', 'true');
-                    localStorage.setItem('user', 'Admin');
+                useEffect(() => {
+                    setLocalFormData(formData);
+                }, [formData]);
+                
+                const handleSave = () => {
+                    if (modalType === 'add') {
+                        const newEmployee = {
+                            ...localFormData,
+                            id: `EMP${String(employees.length + 1).padStart(3, '0')}`,
+                            basicSalary: Number(localFormData.basicSalary) || 0,
+                            allowances: Number(localFormData.allowances) || 0,
+                            loanRepayment: Number(localFormData.loanRepayment) || 0,
+                            salaryAdvance: Number(localFormData.salaryAdvance) || 0,
+                            saccoContribution: Number(localFormData.saccoContribution) || 0,
+                            pensionContribution: Number(localFormData.pensionContribution) || 0,
+                            insurance: Number(localFormData.insurance) || 0
+                        };
+                        setEmployees([...employees, newEmployee]);
+                    } else if (modalType === 'edit') {
+                        const updatedEmployees = employees.map(emp =>
+                            emp.id === localFormData.id ? {
+                                ...localFormData,
+                                basicSalary: Number(localFormData.basicSalary) || 0,
+                                allowances: Number(localFormData.allowances) || 0,
+                                loanRepayment: Number(localFormData.loanRepayment) || 0,
+                                salaryAdvance: Number(localFormData.salaryAdvance) || 0,
+                                saccoContribution: Number(localFormData.saccoContribution) || 0,
+                                pensionContribution: Number(localFormData.pensionContribution) || 0,
+                                insurance: Number(localFormData.insurance) || 0
+                            } : emp
+                        );
+                        setEmployees(updatedEmployees);
+                    }
+                    setShowModal(false);
+                };
+                
+                const grossSalary = (Number(localFormData.basicSalary) || 0) + (Number(localFormData.allowances) || 0);
+                const calculatedPAYE = calculatePAYE(grossSalary);
+                const calculatedNHIF = calculateNHIF(grossSalary);
+                const calculatedNSSF = calculateNSSF(grossSalary);
+                
+                if (modalType === 'view') {
+                    return (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                            <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                                <div className="p-6">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <h2 className="text-2xl font-bold text-gray-900">Employee Details</h2>
+                                        <button
+                                            onClick={() => setShowModal(false)}
+                                            className="text-gray-400 hover:text-gray-600"
+                                        >
+                                            <span className="text-2xl">&times;</span>
+                                        </button>
+                                    </div>
+                                    
+                                    {selectedEmployee && (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                                                <p className="text-gray-900">{selectedEmployee.name}</p>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Employee ID</label>
+                                                <p className="text-gray-900">{selectedEmployee.id}</p>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Position</label>
+                                                <p className="text-gray-900">{selectedEmployee.position}</p>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Basic Salary</label>
+                                                <p className="text-gray-900">KSh {selectedEmployee.basicSalary.toLocaleString()}</p>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Allowances</label>
+                                                <p className="text-gray-900">KSh {selectedEmployee.allowances.toLocaleString()}</p>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Bank/M-Pesa Details</label>
+                                                <p className="text-gray-900">{selectedEmployee.bankDetails}</p>
+                                            </div>
+                                            
+                                            <div className="md:col-span-2">
+                                                <h3 className="text-lg font-medium text-gray-900 mb-3">Deductions</h3>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700 mb-1">Loan Repayment</label>
+                                                        <p className="text-gray-900">KSh {selectedEmployee.loanRepayment.toLocaleString()}</p>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700 mb-1">Salary Advance</label>
+                                                        <p className="text-gray-900">KSh {selectedEmployee.salaryAdvance.toLocaleString()}</p>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700 mb-1">Sacco Contribution</label>
+                                                        <p className="text-gray-900">KSh {selectedEmployee.saccoContribution.toLocaleString()}</p>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700 mb-1">Pension Contribution</label>
+                                                        <p className="text-gray-900">KSh {selectedEmployee.pensionContribution.toLocaleString()}</p>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700 mb-1">Insurance/Welfare</label>
+                                                        <p className="text-gray-900">KSh {selectedEmployee.insurance.toLocaleString()}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    
+                                    <div className="mt-6 flex justify-end">
+                                        <button
+                                            onClick={() => setShowModal(false)}
+                                            className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700"
+                                        >
+                                            Close
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    );
                 }
-            }
-        }
-
-        // Handle logout
-        function handleLogout() {
-            localStorage.removeItem('isLoggedIn');
-            localStorage.removeItem('user');
-            loginPage.style.display = 'flex';
-            mainApp.style.display = 'none';
-            
-            // Reset form
-            loginForm.reset();
-        }
-
-        // Toggle sidebar on mobile
-        function toggleSidebar() {
-            sidebar.classList.toggle('show');
-        }
-
-        // Navigate to page
-        function navigateToPage(e) {
-            e.preventDefault();
-            const page = e.currentTarget.dataset.page;
-            
-            // Hide all pages
-            pageContents.forEach(content => {
-                content.style.display = 'none';
-            });
-            
-            // Show selected page
-            const selectedPage = document.getElementById(`${page}Page`);
-            if (selectedPage) {
-                selectedPage.style.display = 'block';
-                selectedPage.classList.add('fade-in');
-            }
-            
-            // Update active nav link
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-            });
-            e.currentTarget.classList.add('active');
-            
-            // Initialize charts if reports page
-            if (page === 'reports') {
-                setTimeout(() => {
-                    initializeCharts();
-                }, 100);
-            }
-            
-            // Close sidebar on mobile after navigation
-            if (window.innerWidth < 992) {
-                sidebar.classList.remove('show');
-            }
-        }
-
-        // Open employee modal
-        function openEmployeeModal(mode, employeeName = '') {
-            // Reset form
-            employeeForm.reset();
-            
-            // Update modal title
-            if (mode === 'add') {
-                employeeModalTitle.textContent = 'Add New Employee';
-                // Enable form inputs
-                employeeForm.querySelectorAll('input').forEach(input => {
-                    input.removeAttribute('readonly');
-                });
-            } else if (mode === 'edit') {
-                employeeModalTitle.textContent = 'Edit Employee';
-                // Enable form inputs
-                employeeForm.querySelectorAll('input').forEach(input => {
-                    input.removeAttribute('readonly');
-                });
-                // In a real app, we would fetch employee data here
-                document.getElementById('employeeName').value = employeeName || 'John Doe';
-                document.getElementById('employeeID').value = 'EMP001';
-                document.getElementById('employeePosition').value = 'Software Developer';
-                document.getElementById('basicSalary').value = '85000';
-                calculateStatutoryDeductions();
-            } else if (mode === 'view') {
-                employeeModalTitle.textContent = 'Employee Details';
-                // Disable form inputs
-                employeeForm.querySelectorAll('input').forEach(input => {
-                    input.setAttribute('readonly', true);
-                });
-                // In a real app, we would fetch employee data here
-                document.getElementById('employeeName').value = employeeName || 'John Doe';
-                document.getElementById('employeeID').value = 'EMP001';
-                document.getElementById('employeePosition').value = 'Software Developer';
-                document.getElementById('basicSalary').value = '85000';
-                calculateStatutoryDeductions();
-            }
-            
-            // Show modal
-            employeeModal.show();
-        }
-
-        // Save employee
-        function saveEmployee() {
-            // In a real app, this would save to a database
-            alert('Employee saved successfully!');
-            employeeModal.hide();
-        }
-
-        // Calculate statutory deductions
-        function calculateStatutoryDeductions() {
-            const basicSalary = parseFloat(basicSalaryInput.value) || 0;
-            
-            // Simple PAYE calculation (not accurate, just for demo)
-            let paye = 0;
-            if (basicSalary > 24000) {
-                paye = (basicSalary - 24000) * 0.25;
-            }
-            
-            // Simple NHIF calculation (not accurate, just for demo)
-            let nhif = 0;
-            if (basicSalary > 0) {
-                nhif = 1700; // Max NHIF
-            }
-            
-            // Simple NSSF calculation (not accurate, just for demo)
-            let nssf = Math.min(basicSalary * 0.06, 2000);
-            
-            // Update inputs
-            payeInput.value = paye.toFixed(2);
-            nhifInput.value = nhif.toFixed(2);
-            nssfInput.value = nssf.toFixed(2);
-        }
-
-        // Generate payroll
-        function generatePayroll() {
-            // In a real app, this would generate payroll for all employees
-            alert('Payroll generated successfully!');
-        }
-
-        // Generate payslip
-        function generatePayslip(e) {
-            e.preventDefault();
-            
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            // Company info
-            const companyName = "Kenya Payroll System";
-            const companyAddress = "Nairobi, Kenya";
-            
-            // Get employee row
-            const row = e.target.closest('tr');
-            const employeeName = row.cells[0].textContent.trim();
-            
-            // Header
-            doc.setFontSize(18);
-            doc.text(companyName, 105, 15, { align: 'center' });
-            doc.setFontSize(10);
-            doc.text(companyAddress, 105, 22, { align: 'center' });
-            
-            // Title
-            doc.setFontSize(14);
-            doc.text('PAYSLIP FOR DECEMBER 2023', 105, 35, { align: 'center' });
-            
-            // Employee details
-            doc.setFontSize(12);
-            doc.text(`Employee Name: ${employeeName}`, 20, 50);
-            doc.text(`Employee ID: EMP001`, 20, 57);
-            doc.text(`Position: Software Developer`, 20, 64);
-            
-            // Earnings
-            doc.setFontSize(12);
-            doc.text('EARNINGS', 20, 80);
-            doc.setFontSize(10);
-            doc.text(`Basic Salary: KES 85,000`, 25, 90);
-            doc.text(`Allowances: KES 10,000`, 25, 97);
-            doc.text(`Overtime: KES 5,000`, 25, 104);
-            
-            // Total earnings
-            doc.text(`Total Earnings: KES 100,000`, 25, 115);
-            
-            // Deductions
-            doc.setFontSize(12);
-            doc.text('DEDUCTIONS', 20, 130);
-            doc.setFontSize(10);
-            doc.text(`PAYE: KES 18,750`, 25, 140);
-            doc.text(`NHIF: KES 1,700`, 25, 147);
-            doc.text(`NSSF: KES 2,000`, 25, 154);
-            doc.text(`Loan Repayment: KES 5,000`, 25, 161);
-            doc.text(`Sacco Contribution: KES 3,000`, 25, 168);
-            doc.text(`Pension Contribution: KES 5,000`, 25, 175);
-            doc.text(`Insurance/Welfare: KES 2,000`, 25, 182);
-            
-            // Total deductions
-            doc.text(`Total Deductions: KES 37,450`, 25, 195);
-            
-            // Net pay
-            doc.setFontSize(12);
-            doc.text(`NET PAY: KES 62,550`, 105, 210, { align: 'center' });
-            
-            // Save the PDF
-            doc.save(`payslip_${employeeName}_December_2023.pdf`);
-        }
-
-        // Export to Excel
-        function exportToExcel() {
-            // In a real app, this would generate an Excel file
-            alert('Excel export functionality would be implemented here');
-        }
-
-        // Send payslips
-        function sendPayslips() {
-            // In a real app, this would send payslips via email
-            alert('Payslips sent successfully!');
-        }
-
-        // Download PDF
-        function downloadPdf() {
-            // In a real app, this would generate a PDF report
-            alert('PDF download functionality would be implemented here');
-        }
-
-        // Save settings
-        function saveSettings() {
-            // In a real app, this would save settings to a database
-            alert('Settings saved successfully!');
-        }
-
-        // Filter employees
-        function filterEmployees() {
-            const searchTerm = employeeSearch.value.toLowerCase();
-            const rows = employeesTableBody.querySelectorAll('tr');
-            
-            rows.forEach(row => {
-                const name = row.cells[0].textContent.toLowerCase();
-                const id = row.cells[1].textContent.toLowerCase();
-                const position = row.cells[2].textContent.toLowerCase();
                 
-                if (name.includes(searchTerm) || id.includes(searchTerm) || position.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        }
-
-        // Initialize charts
-        function initializeCharts() {
-            // Payroll Breakdown Chart
-            const payrollBreakdownCtx = document.getElementById('payrollBreakdownChart');
-            if (payrollBreakdownCtx) {
-                new Chart(payrollBreakdownCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Salaries', 'Taxes (PAYE)', 'Deductions'],
-                        datasets: [{
-                            label: 'Amount (KES)',
-                            data: [1200000, 185200, 42600],
-                            backgroundColor: [
-                                'rgba(54, 162, 235, 0.7)',
-                                'rgba(255, 99, 132, 0.7)',
-                                'rgba(75, 192, 192, 0.7)'
-                            ],
-                            borderColor: [
-                                'rgba(54, 162, 235, 1)',
-                                'rgba(255, 99, 132, 1)',
-                                'rgba(75, 192, 192, 1)'
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    callback: function(value) {
-                                        return 'KES ' + value.toLocaleString();
-                                    }
-                                }
-                            }
-                        },
-                        plugins: {
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        return context.dataset.label + ': KES ' + context.raw.toLocaleString();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
+                return (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                            <div className="p-6">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h2 className="text-2xl font-bold text-gray-900">
+                                        {modalType === 'add' ? 'Add New Employee' : 'Edit Employee'}
+                                    </h2>
+                                    <button
+                                        onClick={() => setShowModal(false)}
+                                        className="text-gray-400 hover:text-gray-600"
+                                    >
+                                        <span className="text-2xl">&times;</span>
+                                    </button>
+                                </div>
+                                
+                                <form onSubmit={(e) => {
+                                    e.preventDefault();
+                                    handleSave();
+                                }}>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Name *</label>
+                                            <input
+                                                type="text"
+                                                required
+                                                value={localFormData.name || ''}
+                                                onChange={(e) => setLocalFormData({...localFormData, name: e.target.value})}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                        
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Employee ID *</label>
+                                            <input
+                                                type="text"
+                                                required
+                                                value={localFormData.id || ''}
+                                                onChange={(e) => setLocalFormData({...localFormData, id: e.target.value})}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                disabled={modalType === 'edit'}
+                                            />
+                                        </div>
+                                        
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Position *</label>
+                                            <input
+                                                type="text"
+                                                required
+                                                value={localFormData.position || ''}
+                                                onChange={(e) => setLocalFormData({...localFormData, position: e.target.value})}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                        
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Basic Salary (KSh) *</label>
+                                            <input
+                                                type="number"
+                                                required
+                                                value={localFormData.basicSalary || ''}
+                                                onChange={(e) => setLocalFormData({...localFormData, basicSalary: e.target.value})}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                        
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Allowances (KSh)</label>
+                                            <input
+                                                type="number"
+                                                value={localFormData.allowances || ''}
+                                                onChange={(e) => setLocalFormData({...localFormData, allowances: e.target.value})}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                        
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Bank/M-Pesa Details *</label>
+                                            <input
+                                                type="text"
+                                                required
+                                                value={localFormData.bankDetails || ''}
+                                                onChange={(e) => setLocalFormData({...localFormData, bankDetails: e.target.value})}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Deductions Section */}
+                                    <div className="mb-6">
+                                        <h3 className="text-lg font-medium text-gray-900 mb-4">Non-Statutory Deductions</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Loan Repayment (KSh)</label>
+                                                <input
+                                                    type="number"
+                                                    value={localFormData.loanRepayment || ''}
+                                                    onChange={(e) => setLocalFormData({...localFormData, loanRepayment: e.target.value})}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                />
+                                            </div>
+                                            
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Salary Advance (KSh)</label>
+                                                <input
+                                                    type="number"
+                                                    value={localFormData.salaryAdvance || ''}
+                                                    onChange={(e) => setLocalFormData({...localFormData, salaryAdvance: e.target.value})}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                />
+                                            </div>
+                                            
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Sacco Contribution (KSh)</label>
+                                                <input
+                                                    type="number"
+                                                    value={localFormData.saccoContribution || ''}
+                                                    onChange={(e) => setLocalFormData({...localFormData, saccoContribution: e.target.value})}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                />
+                                            </div>
+                                            
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Pension Contribution (KSh)</label>
+                                                <input
+                                                    type="number"
+                                                    value={localFormData.pensionContribution || ''}
+                                                    onChange={(e) => setLocalFormData({...localFormData, pensionContribution: e.target.value})}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                />
+                                            </div>
+                                            
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Insurance/Welfare (KSh)</label>
+                                                <input
+                                                    type="number"
+                                                    value={localFormData.insurance || ''}
+                                                    onChange={(e) => setLocalFormData({...localFormData, insurance: e.target.value})}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Statutory Deductions Preview */}
+                                    <div className="mb-6">
+                                        <h3 className="text-lg font-medium text-gray-900 mb-4">Statutory Deductions (Auto-calculated)</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div className="bg-gray-50 p-4 rounded">
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">PAYE (KSh)</label>
+                                                <p className="text-lg font-semibold text-gray-900">{calculatedPAYE.toLocaleString()}</p>
+                                            </div>
+                                            <div className="bg-gray-50 p-4 rounded">
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">NHIF (KSh)</label>
+                                                <p className="text-lg font-semibold text-gray-900">{calculatedNHIF.toLocaleString()}</p>
+                                            </div>
+                                            <div className="bg-gray-50 p-4 rounded">
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">NSSF (KSh)</label>
+                                                <p className="text-lg font-semibold text-gray-900">{calculatedNSSF.toLocaleString()}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex justify-end gap-4">
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowModal(false)}
+                                            className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+                                        >
+                                            Save
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+            
+            // Main render logic
+            if (!isLoggedIn) {
+                return <LoginPage />;
             }
             
-            // Department Distribution Chart
-            const departmentDistributionCtx = document.getElementById('departmentDistributionChart');
-            if (departmentDistributionCtx) {
-                new Chart(departmentDistributionCtx, {
-                    type: 'pie',
-                    data: {
-                        labels: ['IT', 'HR', 'Finance', 'Operations'],
-                        datasets: [{
-                            data: [450000, 320000, 280000, 190000],
-                            backgroundColor: [
-                                'rgba(255, 99, 132, 0.7)',
-                                'rgba(54, 162, 235, 0.7)',
-                                'rgba(255, 206, 86, 0.7)',
-                                'rgba(75, 192, 192, 0.7)'
-                            ],
-                            borderColor: [
-                                'rgba(255, 99, 132, 1)',
-                                'rgba(54, 162, 235, 1)',
-                                'rgba(255, 206, 86, 1)',
-                                'rgba(75, 192, 192, 1)'
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        const label = context.label || '';
-                                        const value = context.raw || 0;
-                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                        const percentage = Math.round((value / total) * 100);
-                                        return label + ': KES ' + value.toLocaleString() + ' (' + percentage + '%)';
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
-            }
+            return (
+                <div className="min-h-screen bg-gray-100">
+                    <Navigation />
+                    <div className="container mx-auto">
+                        {currentPage === 'dashboard' && <DashboardPage />}
+                        {currentPage === 'employees' && <EmployeesPage />}
+                        {currentPage === 'payroll' && <PayrollPage />}
+                        {currentPage === 'reports' && <ReportsPage />}
+                        {currentPage === 'settings' && <SettingsPage />}
+                    </div>
+                    
+                    {showModal && <EmployeeFormModal />}
+                </div>
+            );
         }
 
-        // Check if user is already logged in
-        window.addEventListener('load', function() {
-            const isLoggedIn = localStorage.getItem('isLoggedIn');
-            const user = localStorage.getItem('user');
-            
-            if (isLoggedIn === 'true' && user) {
-                loginPage.style.display = 'none';
-                mainApp.style.display = 'block';
-                document.getElementById('userName').textContent = user;
-            }
-        });
+        ReactDOM.render(<PayrollApp />, document.getElementById('root'));
     </script>
 </body>
 </html>
